@@ -1,4 +1,5 @@
 using QLXeMay.Domain;
+using System.Linq;
 
 namespace QLXeMay.Tests
 {
@@ -14,6 +15,9 @@ namespace QLXeMay.Tests
             TestStockAfterSale();
             TestStockAfterPurchase();
             TestInvalidStockSale();
+            TestPasswordPolicyAcceptsStrongPassword();
+            TestPasswordPolicyRejectsWeakPassword();
+            TestPasswordPolicyRejectsUserNameReuse();
 
             if (failures == 0)
             {
@@ -67,6 +71,36 @@ namespace QLXeMay.Tests
             {
                 Pass("sale quantity above stock throws");
             }
+        }
+
+
+        private static void TestPasswordPolicyAcceptsStrongPassword()
+        {
+            AssertEqual(0, PasswordPolicy.Validate("Str0ng@Pass!", "seller", "Nguyen Van A").Count, "strong password accepted");
+        }
+
+        private static void TestPasswordPolicyRejectsWeakPassword()
+        {
+            IReadOnlyList<string> errors = PasswordPolicy.Validate("abc", "seller", "Nguyen Van A");
+            if (errors.Count >= 4)
+            {
+                Pass("weak password rejected with multiple policy errors");
+                return;
+            }
+
+            Fail("weak password should return multiple policy errors");
+        }
+
+        private static void TestPasswordPolicyRejectsUserNameReuse()
+        {
+            IReadOnlyList<string> errors = PasswordPolicy.Validate("Seller@12345", "seller", "Nguyen Van A");
+            if (errors.Any(e => e.Contains("tên đăng nhập")))
+            {
+                Pass("password containing username rejected");
+                return;
+            }
+
+            Fail("password containing username should be rejected");
         }
 
         private static void AssertEqual(double expected, double actual, string name)

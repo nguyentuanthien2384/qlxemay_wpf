@@ -1,17 +1,19 @@
+using System;
 using System.Windows;
+using System.Windows.Controls;
 using QLXeMay.Services;
 using QLXeMay.ViewModels;
 
 namespace QLXeMay.Windows
 {
-    public partial class UserAdminWindow : Window
+    public partial class UserAdminWindow : UserControl
     {
         private readonly UserAdminWindowViewModel viewModel;
 
-        public UserAdminWindow()
+        public UserAdminWindow(Action goBack)
         {
             InitializeComponent();
-            viewModel = new UserAdminWindowViewModel(new AuthenticationService(), new DialogService(), Close);
+            viewModel = new UserAdminWindowViewModel(new AuthenticationService(), new DialogService(), goBack ?? (() => { }));
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
             DataContext = viewModel;
         }

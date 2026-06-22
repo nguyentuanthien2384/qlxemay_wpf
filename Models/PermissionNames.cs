@@ -13,5 +13,6 @@ namespace QLXeMay.Models
         public const string Reports = "Reports";
         public const string AiAssistant = "AiAssistant";
         public const string UserAdmin = "UserAdmin";
+        public const string AuditLog = "AuditLog";
     }
 }

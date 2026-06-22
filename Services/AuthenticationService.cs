@@ -4,6 +4,7 @@ using System.Data;
 using System.Security.Cryptography;
 using System.Text;
 using QLXeMay.Class;
+using QLXeMay.Domain;
 using QLXeMay.Infrastructure;
 using QLXeMay.Models;
 
@@ -11,7 +12,9 @@ namespace QLXeMay.Services
 {
     internal sealed class AuthenticationService : IAuthenticationService
     {
-        private const int PasswordIterations = 120000;
+        private const int PasswordIterations = 160000;
+        private const int MaxFailedLoginCount = 5;
+        private const int LockoutMinutes = 15;
 
         private static readonly string[] AllPermissions =
         {
@@ -25,7 +28,8 @@ namespace QLXeMay.Services
             PermissionNames.Search,
             PermissionNames.Reports,
             PermissionNames.AiAssistant,
-            PermissionNames.UserAdmin
+            PermissionNames.UserAdmin,
+            PermissionNames.AuditLog
         };
 
         public void EnsureSecuritySchema()
@@ -66,9 +70,16 @@ BEGIN
         isactive BIT NOT NULL DEFAULT 1,
         failedlogincount INT NOT NULL DEFAULT 0,
         createdat DATETIME NOT NULL DEFAULT GETDATE(),
-        lastloginat DATETIME NULL
+        lastloginat DATETIME NULL,
+        lockoutendat DATETIME NULL,
+        mustchangepassword BIT NOT NULL DEFAULT 0,
+        passwordchangedat DATETIME NULL
     );
 END");
+
+            EnsureUserColumn("lockoutendat", "DATETIME NULL");
+            EnsureUserColumn("mustchangepassword", "BIT NOT NULL CONSTRAINT DF_tblusers_mustchangepassword DEFAULT 0 WITH VALUES");
+            EnsureUserColumn("passwordchangedat", "DATETIME NULL");
 
             Function.ExecuteSql(@"
 IF OBJECT_ID(N'tblrolepermissions', N'U') IS NULL
@@ -80,64 +91,107 @@ BEGIN
     );
 END");
 
+            Function.ExecuteSql(@"
+IF OBJECT_ID(N'tblauditlog', N'U') IS NULL
+BEGIN
+    CREATE TABLE tblauditlog (
+        auditid INT IDENTITY(1,1) PRIMARY KEY,
+        eventtype NVARCHAR(80) NOT NULL,
+        username NVARCHAR(50) NULL,
+        userid INT NULL,
+        detail NVARCHAR(500) NULL,
+        createdat DATETIME NOT NULL DEFAULT GETDATE()
+    );
+END");
+
+            EnsureSecurityIndexes();
             SeedPermissions();
             SeedRoles();
             SeedRolePermissions();
             SeedDefaultUsers();
         }
 
-        public UserSession Authenticate(string userName, string password)
+        public AuthenticationResult Authenticate(string userName, string password)
         {
             string normalizedUserName = NormalizeUserName(userName);
             if (string.IsNullOrWhiteSpace(normalizedUserName) || string.IsNullOrWhiteSpace(password))
             {
-                return null;
+                return AuthenticationResult.Failed(AuthFailureReason.ValidationError, "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.");
             }
 
-            DataTable table = Function.GetDataToTable(
-                @"SELECT TOP 1 u.userid, u.username, u.displayname, u.passwordhash, u.passwordsalt,
-                         u.passworditerations, u.isactive, u.roleid, r.rolename, r.displayname AS roledisplayname
-                  FROM tblusers u
-                  INNER JOIN tblroles r ON u.roleid = r.roleid
-                  WHERE u.username=@username",
-                Function.Param("@username", normalizedUserName));
-
-            if (table.Rows.Count == 0)
+            try
             {
-                return null;
-            }
+                DataTable table = Function.GetDataToTable(
+                    @"SELECT TOP 1 u.userid, u.username, u.displayname, u.passwordhash, u.passwordsalt,
+                             u.passworditerations, u.isactive, u.roleid, u.failedlogincount,
+                             u.lockoutendat, u.mustchangepassword,
+                             r.rolename, r.displayname AS roledisplayname
+                      FROM tblusers u
+                      INNER JOIN tblroles r ON u.roleid = r.roleid
+                      WHERE u.username=@username",
+                    Function.Param("@username", normalizedUserName));
 
-            DataRow row = table.Rows[0];
-            int userId = Convert.ToInt32(row["userid"]);
-            if (!Convert.ToBoolean(row["isactive"]))
+                if (table.Rows.Count == 0)
+                {
+                    WriteAudit("LoginFailed", normalizedUserName, null, "User not found.");
+                    return AuthenticationResult.Failed(AuthFailureReason.InvalidCredentials, "Tên đăng nhập hoặc mật khẩu không đúng.");
+                }
+
+                DataRow row = table.Rows[0];
+                int userId = Convert.ToInt32(row["userid"]);
+                bool isActive = Convert.ToBoolean(row["isactive"]);
+                if (!isActive)
+                {
+                    WriteAudit("LoginBlocked", normalizedUserName, userId, "Inactive account.");
+                    return AuthenticationResult.Failed(AuthFailureReason.Inactive, "Tài khoản đang bị tạm ngưng. Liên hệ quản trị viên để kích hoạt.");
+                }
+
+                DateTime? lockoutEndAt = ToNullableDate(row["lockoutendat"]);
+                if (lockoutEndAt.HasValue && lockoutEndAt.Value > DateTime.Now)
+                {
+                    WriteAudit("LoginLockedOut", normalizedUserName, userId, "Locked until " + lockoutEndAt.Value.ToString("s"));
+                    return AuthenticationResult.Failed(AuthFailureReason.LockedOut,
+                        "Tài khoản đang bị khóa tạm thời đến " + lockoutEndAt.Value.ToString("dd/MM/yyyy HH:mm") + ".",
+                        lockoutEndAt);
+                }
+
+                string storedHash = row["passwordhash"].ToString();
+                string storedSalt = row["passwordsalt"].ToString();
+                int iterations = Convert.ToInt32(row["passworditerations"]);
+
+                if (!PasswordHasher.Verify(password, storedSalt, storedHash, iterations))
+                {
+                    DateTime? newLockoutEndAt = RegisterFailedLogin(userId, normalizedUserName, Convert.ToInt32(row["failedlogincount"]));
+                    if (newLockoutEndAt.HasValue)
+                    {
+                        return AuthenticationResult.Failed(AuthFailureReason.LockedOut,
+                            "Tài khoản đã bị khóa " + LockoutMinutes + " phút do đăng nhập sai quá " + MaxFailedLoginCount + " lần.",
+                            newLockoutEndAt);
+                    }
+
+                    return AuthenticationResult.Failed(AuthFailureReason.InvalidCredentials, "Tên đăng nhập hoặc mật khẩu không đúng.");
+                }
+
+                int roleId = Convert.ToInt32(row["roleid"]);
+                bool mustChangePassword = Convert.ToBoolean(row["mustchangepassword"]);
+                ResetLoginState(userId);
+                WriteAudit("LoginSuccess", normalizedUserName, userId, mustChangePassword ? "Must change password." : "OK.");
+
+                UserSession session = new UserSession(
+                    userId,
+                    row["username"].ToString(),
+                    row["displayname"].ToString(),
+                    row["rolename"].ToString(),
+                    row["roledisplayname"].ToString(),
+                    LoadPermissionKeys(roleId));
+
+                return AuthenticationResult.Success(session, mustChangePassword);
+            }
+            catch (Exception ex)
             {
-                return null;
+                AppLogger.Error("Authentication failed.", ex);
+                return AuthenticationResult.Failed(AuthFailureReason.DatabaseError, "Không thể đăng nhập do lỗi hệ thống: " + ex.Message);
             }
-
-            string storedHash = row["passwordhash"].ToString();
-            string storedSalt = row["passwordsalt"].ToString();
-            int iterations = Convert.ToInt32(row["passworditerations"]);
-
-            if (!PasswordHasher.Verify(password, storedSalt, storedHash, iterations))
-            {
-                Function.ExecuteSql(
-                    "UPDATE tblusers SET failedlogincount=failedlogincount+1 WHERE userid=@userid",
-                    Function.Param("@userid", userId));
-                return null;
-            }
-
-            int roleId = Convert.ToInt32(row["roleid"]);
-            Function.ExecuteSql(
-                "UPDATE tblusers SET failedlogincount=0, lastloginat=GETDATE() WHERE userid=@userid",
-                Function.Param("@userid", userId));
-
-            return new UserSession(
-                userId,
-                row["username"].ToString(),
-                row["displayname"].ToString(),
-                row["rolename"].ToString(),
-                row["roledisplayname"].ToString(),
-                LoadPermissionKeys(roleId));
         }
 
         public IReadOnlyList<UserAccountInfo> LoadUsers()
@@ -145,6 +199,8 @@ END");
             DataTable table = Function.GetDataToTable(
                 @"SELECT u.userid, u.username, u.displayname, u.isactive, u.failedlogincount,
                          CONVERT(NVARCHAR(19), u.lastloginat, 120) AS lastloginat,
+                         u.lockoutendat, u.mustchangepassword,
+                         CONVERT(NVARCHAR(19), u.passwordchangedat, 120) AS passwordchangedat,
                          r.rolename, r.displayname AS roledisplayname
                   FROM tblusers u
                   INNER JOIN tblroles r ON u.roleid = r.roleid
@@ -161,6 +217,9 @@ END");
                     IsActive = Convert.ToBoolean(row["isactive"]),
                     FailedLoginCount = Convert.ToInt32(row["failedlogincount"]),
                     LastLoginAt = row["lastloginat"] == DBNull.Value ? "" : row["lastloginat"].ToString(),
+                    LockoutEndAt = ToNullableDate(row["lockoutendat"]),
+                    MustChangePassword = Convert.ToBoolean(row["mustchangepassword"]),
+                    PasswordChangedAt = row["passwordchangedat"] == DBNull.Value ? "" : row["passwordchangedat"].ToString(),
                     RoleName = row["rolename"].ToString(),
                     RoleDisplayName = row["roledisplayname"].ToString()
                 });
@@ -192,10 +251,7 @@ END");
         {
             string normalizedUserName = NormalizeUserName(userName);
             ValidateUserInput(normalizedUserName, displayName, roleId);
-            if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
-            {
-                throw new ArgumentException("Mật khẩu phải có ít nhất 6 ký tự.");
-            }
+            ValidatePasswordStrength(password, normalizedUserName, displayName);
 
             if (Function.CheckKey("SELECT 1 FROM tblusers WHERE username=@username", Function.Param("@username", normalizedUserName)))
             {
@@ -204,8 +260,8 @@ END");
 
             PasswordHash passwordHash = PasswordHasher.Hash(password);
             Function.ExecuteSql(
-                @"INSERT INTO tblusers(username, displayname, passwordhash, passwordsalt, passworditerations, roleid, isactive)
-                  VALUES(@username, @displayname, @hash, @salt, @iterations, @roleid, @isactive)",
+                @"INSERT INTO tblusers(username, displayname, passwordhash, passwordsalt, passworditerations, roleid, isactive, failedlogincount, lockoutendat, mustchangepassword, passwordchangedat)
+                  VALUES(@username, @displayname, @hash, @salt, @iterations, @roleid, @isactive, 0, NULL, 1, NULL)",
                 Function.Param("@username", normalizedUserName),
                 Function.Param("@displayname", displayName.Trim()),
                 Function.Param("@hash", passwordHash.Hash),
@@ -213,6 +269,32 @@ END");
                 Function.Param("@iterations", passwordHash.Iterations),
                 Function.Param("@roleid", roleId),
                 Function.Param("@isactive", isActive));
+            WriteAudit("UserCreated", normalizedUserName, null, "Created by admin. Active=" + isActive);
+        }
+
+        public void RegisterUser(string userName, string displayName, string password)
+        {
+            string normalizedUserName = NormalizeUserName(userName);
+            int viewerRoleId = GetRoleId("Viewer");
+            ValidateUserInput(normalizedUserName, displayName, viewerRoleId);
+            ValidatePasswordStrength(password, normalizedUserName, displayName);
+
+            if (Function.CheckKey("SELECT 1 FROM tblusers WHERE username=@username", Function.Param("@username", normalizedUserName)))
+            {
+                throw new InvalidOperationException("Tên đăng nhập đã tồn tại.");
+            }
+
+            PasswordHash passwordHash = PasswordHasher.Hash(password);
+            Function.ExecuteSql(
+                @"INSERT INTO tblusers(username, displayname, passwordhash, passwordsalt, passworditerations, roleid, isactive, failedlogincount, lockoutendat, mustchangepassword, passwordchangedat)
+                  VALUES(@username, @displayname, @hash, @salt, @iterations, @roleid, 0, 0, NULL, 0, GETDATE())",
+                Function.Param("@username", normalizedUserName),
+                Function.Param("@displayname", displayName.Trim()),
+                Function.Param("@hash", passwordHash.Hash),
+                Function.Param("@salt", passwordHash.Salt),
+                Function.Param("@iterations", passwordHash.Iterations),
+                Function.Param("@roleid", viewerRoleId));
+            WriteAudit("UserRegistered", normalizedUserName, null, "Self-registration; waiting for admin activation.");
         }
 
         public void UpdateUser(int userId, string displayName, int roleId, bool isActive)
@@ -226,25 +308,136 @@ END");
                 Function.Param("@roleid", roleId),
                 Function.Param("@isactive", isActive),
                 Function.Param("@userid", userId));
+            WriteAudit("UserUpdated", null, userId, "Updated profile/role/active state.");
         }
 
         public void ResetPassword(int userId, string newPassword)
         {
             if (userId <= 0) throw new ArgumentException("Chọn tài khoản cần đổi mật khẩu.");
-            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
-            {
-                throw new ArgumentException("Mật khẩu mới phải có ít nhất 6 ký tự.");
-            }
+            string userName = GetUserName(userId);
+            string displayName = GetDisplayName(userId);
+            ValidatePasswordStrength(newPassword, userName, displayName);
 
             PasswordHash passwordHash = PasswordHasher.Hash(newPassword);
             Function.ExecuteSql(
                 @"UPDATE tblusers
-                  SET passwordhash=@hash, passwordsalt=@salt, passworditerations=@iterations, failedlogincount=0
+                  SET passwordhash=@hash,
+                      passwordsalt=@salt,
+                      passworditerations=@iterations,
+                      failedlogincount=0,
+                      lockoutendat=NULL,
+                      mustchangepassword=1,
+                      passwordchangedat=NULL
                   WHERE userid=@userid",
                 Function.Param("@hash", passwordHash.Hash),
                 Function.Param("@salt", passwordHash.Salt),
                 Function.Param("@iterations", passwordHash.Iterations),
                 Function.Param("@userid", userId));
+            WriteAudit("PasswordReset", userName, userId, "Temporary password set by admin.");
+        }
+
+        public void ChangePassword(int userId, string currentPassword, string newPassword)
+        {
+            if (userId <= 0) throw new ArgumentException("Tài khoản không hợp lệ.");
+            if (string.IsNullOrWhiteSpace(currentPassword)) throw new ArgumentException("Nhập mật khẩu hiện tại.");
+
+            DataTable table = Function.GetDataToTable(
+                @"SELECT userid, username, displayname, passwordhash, passwordsalt, passworditerations
+                  FROM tblusers WHERE userid=@userid",
+                Function.Param("@userid", userId));
+            if (table.Rows.Count == 0) throw new InvalidOperationException("Không tìm thấy tài khoản.");
+
+            DataRow row = table.Rows[0];
+            string userName = row["username"].ToString();
+            string displayName = row["displayname"].ToString();
+            if (!PasswordHasher.Verify(currentPassword, row["passwordsalt"].ToString(), row["passwordhash"].ToString(), Convert.ToInt32(row["passworditerations"])))
+            {
+                throw new InvalidOperationException("Mật khẩu hiện tại không đúng.");
+            }
+
+            if (currentPassword == newPassword)
+            {
+                throw new ArgumentException("Mật khẩu mới phải khác mật khẩu hiện tại.");
+            }
+
+            ValidatePasswordStrength(newPassword, userName, displayName);
+            PasswordHash passwordHash = PasswordHasher.Hash(newPassword);
+            Function.ExecuteSql(
+                @"UPDATE tblusers
+                  SET passwordhash=@hash,
+                      passwordsalt=@salt,
+                      passworditerations=@iterations,
+                      failedlogincount=0,
+                      lockoutendat=NULL,
+                      mustchangepassword=0,
+                      passwordchangedat=GETDATE()
+                  WHERE userid=@userid",
+                Function.Param("@hash", passwordHash.Hash),
+                Function.Param("@salt", passwordHash.Salt),
+                Function.Param("@iterations", passwordHash.Iterations),
+                Function.Param("@userid", userId));
+            WriteAudit("PasswordChanged", userName, userId, "Password changed by user.");
+        }
+
+        public void UnlockUser(int userId)
+        {
+            if (userId <= 0) throw new ArgumentException("Chọn tài khoản cần mở khóa.");
+            Function.ExecuteSql(
+                "UPDATE tblusers SET failedlogincount=0, lockoutendat=NULL WHERE userid=@userid",
+                Function.Param("@userid", userId));
+            WriteAudit("UserUnlocked", null, userId, "Unlocked by admin.");
+        }
+
+        private static void EnsureUserColumn(string columnName, string sqlTypeAndDefault)
+        {
+            Function.ExecuteSql(
+                "IF COL_LENGTH('tblusers', '" + columnName + "') IS NULL ALTER TABLE tblusers ADD " + columnName + " " + sqlTypeAndDefault);
+        }
+
+        private static DateTime? RegisterFailedLogin(int userId, string userName, int oldFailedCount)
+        {
+            int newFailedCount = oldFailedCount + 1;
+            if (newFailedCount >= MaxFailedLoginCount)
+            {
+                DateTime lockoutEndAt = DateTime.Now.AddMinutes(LockoutMinutes);
+                Function.ExecuteSql(
+                    "UPDATE tblusers SET failedlogincount=@failedlogincount, lockoutendat=@lockoutendat WHERE userid=@userid",
+                    Function.Param("@failedlogincount", newFailedCount),
+                    Function.Param("@lockoutendat", lockoutEndAt),
+                    Function.Param("@userid", userId));
+                WriteAudit("LoginLockout", userName, userId, "Locked after failed login count " + newFailedCount + ".");
+                return lockoutEndAt;
+            }
+
+            Function.ExecuteSql(
+                "UPDATE tblusers SET failedlogincount=@failedlogincount WHERE userid=@userid",
+                Function.Param("@failedlogincount", newFailedCount),
+                Function.Param("@userid", userId));
+            WriteAudit("LoginFailed", userName, userId, "Failed count " + newFailedCount + ".");
+            return null;
+        }
+
+        private static void ResetLoginState(int userId)
+        {
+            Function.ExecuteSql(
+                "UPDATE tblusers SET failedlogincount=0, lockoutendat=NULL, lastloginat=GETDATE() WHERE userid=@userid",
+                Function.Param("@userid", userId));
+        }
+
+
+        private static void EnsureSecurityIndexes()
+        {
+            Function.ExecuteSql(@"
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_tblusers_roleid' AND object_id = OBJECT_ID(N'tblusers'))
+    CREATE INDEX IX_tblusers_roleid ON tblusers(roleid);");
+
+            Function.ExecuteSql(@"
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_tblauditlog_createdat' AND object_id = OBJECT_ID(N'tblauditlog'))
+    CREATE INDEX IX_tblauditlog_createdat ON tblauditlog(createdat DESC);");
+
+            Function.ExecuteSql(@"
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_tblauditlog_eventtype' AND object_id = OBJECT_ID(N'tblauditlog'))
+    CREATE INDEX IX_tblauditlog_eventtype ON tblauditlog(eventtype, createdat DESC);");
         }
 
         private static void SeedPermissions()
@@ -260,6 +453,7 @@ END");
             EnsurePermission(PermissionNames.Reports, "Xem báo cáo");
             EnsurePermission(PermissionNames.AiAssistant, "Sử dụng trợ lý AI");
             EnsurePermission(PermissionNames.UserAdmin, "Quản trị tài khoản");
+            EnsurePermission(PermissionNames.AuditLog, "Xem nhật ký hệ thống");
         }
 
         private static void SeedRoles()
@@ -311,11 +505,11 @@ END");
 
         private static void SeedDefaultUsers()
         {
-            EnsureUser("admin", "Quản trị viên", "Admin@123", "Administrator");
-            EnsureUser("manager", "Quản lý cửa hàng", "Manager@123", "Manager");
-            EnsureUser("sales", "Nhân viên bán hàng", "Sales@123", "Sales");
-            EnsureUser("warehouse", "Nhân viên kho", "Warehouse@123", "Warehouse");
-            EnsureUser("viewer", "Tài khoản xem báo cáo", "Viewer@123", "Viewer");
+            EnsureUser("admin", "Quản trị viên", "Admin@12345", "Administrator");
+            EnsureUser("manager", "Quản lý cửa hàng", "Manager@12345", "Manager");
+            EnsureUser("sales", "Nhân viên bán hàng", "Sales@12345", "Sales");
+            EnsureUser("warehouse", "Nhân viên kho", "Warehouse@12345", "Warehouse");
+            EnsureUser("viewer", "Tài khoản xem báo cáo", "Viewer@12345", "Viewer");
         }
 
         private static void EnsurePermission(string permissionKey, string displayName)
@@ -361,8 +555,8 @@ END");
 
             PasswordHash passwordHash = PasswordHasher.Hash(password);
             Function.ExecuteSql(
-                @"INSERT INTO tblusers(username, displayname, passwordhash, passwordsalt, passworditerations, roleid, isactive)
-                  VALUES(@username, @displayname, @hash, @salt, @iterations, @roleid, 1)",
+                @"INSERT INTO tblusers(username, displayname, passwordhash, passwordsalt, passworditerations, roleid, isactive, mustchangepassword, passwordchangedat)
+                  VALUES(@username, @displayname, @hash, @salt, @iterations, @roleid, 1, 0, GETDATE())",
                 Function.Param("@username", userName),
                 Function.Param("@displayname", displayName),
                 Function.Param("@hash", passwordHash.Hash),
@@ -407,19 +601,55 @@ END");
 
         private static void ValidateUserInput(string userName, string displayName, int roleId)
         {
-            if (string.IsNullOrWhiteSpace(userName))
+            if (string.IsNullOrWhiteSpace(userName)) throw new ArgumentException("Tên đăng nhập không được để trống.");
+            if (userName.Length < 3 || userName.Length > 50) throw new ArgumentException("Tên đăng nhập phải từ 3 đến 50 ký tự.");
+            foreach (char c in userName)
             {
-                throw new ArgumentException("Tên đăng nhập không được để trống.");
+                bool valid = char.IsLetterOrDigit(c) || c == '.' || c == '_' || c == '-';
+                if (!valid) throw new ArgumentException("Tên đăng nhập chỉ được gồm chữ, số, dấu chấm, gạch dưới hoặc gạch ngang.");
             }
 
-            if (string.IsNullOrWhiteSpace(displayName))
-            {
-                throw new ArgumentException("Tên hiển thị không được để trống.");
-            }
+            if (string.IsNullOrWhiteSpace(displayName)) throw new ArgumentException("Tên hiển thị không được để trống.");
+            if (displayName.Trim().Length < 3 || displayName.Trim().Length > 100) throw new ArgumentException("Tên hiển thị phải từ 3 đến 100 ký tự.");
+            if (roleId <= 0) throw new ArgumentException("Chọn vai trò cho tài khoản.");
+        }
 
-            if (roleId <= 0)
+        private static void ValidatePasswordStrength(string password, string userName, string displayName)
+        {
+            PasswordPolicy.ThrowIfInvalid(password, userName, displayName);
+        }
+
+        private static DateTime? ToNullableDate(object value)
+        {
+            if (value == null || value == DBNull.Value) return null;
+            return Convert.ToDateTime(value);
+        }
+
+        private static string GetUserName(int userId)
+        {
+            return Function.GetFieldValues("SELECT username FROM tblusers WHERE userid=@userid", Function.Param("@userid", userId));
+        }
+
+        private static string GetDisplayName(int userId)
+        {
+            return Function.GetFieldValues("SELECT displayname FROM tblusers WHERE userid=@userid", Function.Param("@userid", userId));
+        }
+
+        private static void WriteAudit(string eventType, string userName, int? userId, string detail)
+        {
+            try
             {
-                throw new ArgumentException("Chọn vai trò cho tài khoản.");
+                Function.ExecuteSql(
+                    @"IF OBJECT_ID(N'tblauditlog', N'U') IS NOT NULL
+                      INSERT INTO tblauditlog(eventtype, username, userid, detail) VALUES(@eventtype, @username, @userid, @detail)",
+                    Function.Param("@eventtype", eventType),
+                    Function.Param("@username", string.IsNullOrWhiteSpace(userName) ? null : userName),
+                    Function.Param("@userid", userId.HasValue ? (object)userId.Value : null),
+                    Function.Param("@detail", detail));
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Cannot write audit log.", ex);
             }
         }
 

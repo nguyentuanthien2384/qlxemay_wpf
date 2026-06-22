@@ -1,10 +1,10 @@
-using System.Windows;
+using System.Windows.Controls;
 using QLXeMay.Services;
 using QLXeMay.ViewModels;
 
 namespace QLXeMay.Windows
 {
-    public partial class AIAssistantWindow : Window
+    public partial class AIAssistantWindow : UserControl
     {
         public AIAssistantWindow()
         {

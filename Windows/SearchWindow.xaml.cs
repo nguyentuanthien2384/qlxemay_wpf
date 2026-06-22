@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using QLXeMay.Class;
@@ -8,12 +9,12 @@ using QLXeMay.ViewModels;
 
 namespace QLXeMay.Windows
 {
-    public partial class SearchWindow : Window
+    public partial class SearchWindow : UserControl
     {
         private readonly SearchMode mode;
         private readonly Dictionary<string, Control> controls = new Dictionary<string, Control>();
 
-        public SearchWindow(SearchMode mode)
+        public SearchWindow(SearchMode mode, Action goBack)
         {
             InitializeComponent();
             this.mode = mode;
@@ -24,7 +25,7 @@ namespace QLXeMay.Windows
                 new DialogService(),
                 ReadCriteria,
                 ClearCriteria,
-                Close);
+                goBack ?? (() => { }));
             Loaded += (s, e) => BuildCriteria();
         }
 

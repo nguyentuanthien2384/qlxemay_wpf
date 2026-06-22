@@ -14,21 +14,35 @@ namespace QLXeMay.ViewModels
         private readonly IWindowService windowService;
         private readonly IDialogService dialogService;
         private readonly UserSession currentUser;
+        private readonly HomeView homeView;
+
+        private object currentView;
+        private bool isNotHome;
+        private string currentTitle = "Bảng điều khiển";
+
+        private string revenueText = "—";
+        private string profitText = "—";
+        private string orderCountText = "—";
+        private string stockText = "—";
+        private string customerText = "—";
+        private System.Collections.Generic.IReadOnlyList<RevenueBar> monthlyRevenue = new System.Collections.Generic.List<RevenueBar>();
 
         public MainWindowViewModel(IWindowService windowService, IDialogService dialogService)
         {
             this.windowService = windowService;
             this.dialogService = dialogService;
             currentUser = AppSession.CurrentUser;
+            homeView = new HomeView();
+            LoadDashboard();
 
-            OpenCongViecCommand = CreateAuthorizedCommand(PermissionNames.ManageEmployees, () => Open(new DanhMucWindow(new DanhMucConfig("DANH MỤC CÔNG VIỆC", "tblcongviec", new List<FieldConfig>
+            OpenCongViecCommand = CreateAuthorizedCommand(PermissionNames.ManageEmployees, () => Show("Danh mục công việc", new DanhMucWindow(new DanhMucConfig("DANH MỤC CÔNG VIỆC", "tblcongviec", new List<FieldConfig>
             {
                 new FieldConfig("macv", "Mã công việc", FieldKind.Text, true, true),
                 new FieldConfig("tencv", "Tên công việc", FieldKind.Text, true, false),
                 new FieldConfig("luongthang", "Lương tháng", FieldKind.Number, true, false)
-            }))));
+            }), GoHome)));
 
-            OpenNhanVienCommand = CreateAuthorizedCommand(PermissionNames.ManageEmployees, () => Open(new DanhMucWindow(new DanhMucConfig("DANH MỤC NHÂN VIÊN", "tblnhanvien", new List<FieldConfig>
+            OpenNhanVienCommand = CreateAuthorizedCommand(PermissionNames.ManageEmployees, () => Show("Nhân viên", new DanhMucWindow(new DanhMucConfig("DANH MỤC NHÂN VIÊN", "tblnhanvien", new List<FieldConfig>
             {
                 new FieldConfig("manv", "Mã nhân viên", FieldKind.Text, true, true),
                 new FieldConfig("tennv", "Tên nhân viên", FieldKind.Text, true, false),
@@ -38,25 +52,25 @@ namespace QLXeMay.ViewModels
                 new FieldConfig("diachi", "Địa chỉ", FieldKind.Text, true, false),
                 new FieldConfig("macv", "Công việc", FieldKind.Combo, true, false,
                     "SELECT macv, macv + ' - ' + tencv AS hienthi FROM tblcongviec", "macv", "hienthi")
-            }))));
+            }), GoHome)));
 
-            OpenKhachHangCommand = CreateAuthorizedCommand(PermissionNames.ManageCustomers, () => Open(new DanhMucWindow(new DanhMucConfig("DANH MỤC KHÁCH HÀNG", "tblkhachhang", new List<FieldConfig>
+            OpenKhachHangCommand = CreateAuthorizedCommand(PermissionNames.ManageCustomers, () => Show("Khách hàng", new DanhMucWindow(new DanhMucConfig("DANH MỤC KHÁCH HÀNG", "tblkhachhang", new List<FieldConfig>
             {
                 new FieldConfig("makhach", "Mã khách", FieldKind.Text, true, true),
                 new FieldConfig("tenkhach", "Tên khách", FieldKind.Text, true, false),
                 new FieldConfig("diachi", "Địa chỉ", FieldKind.Text, true, false),
                 new FieldConfig("sdt", "Điện thoại", FieldKind.Text, true, false)
-            }))));
+            }), GoHome)));
 
-            OpenNhaCungCapCommand = CreateAuthorizedCommand(PermissionNames.ManageSuppliers, () => Open(new DanhMucWindow(new DanhMucConfig("DANH MỤC NHÀ CUNG CẤP", "tblnhacungcap", new List<FieldConfig>
+            OpenNhaCungCapCommand = CreateAuthorizedCommand(PermissionNames.ManageSuppliers, () => Show("Nhà cung cấp", new DanhMucWindow(new DanhMucConfig("DANH MỤC NHÀ CUNG CẤP", "tblnhacungcap", new List<FieldConfig>
             {
                 new FieldConfig("mancc", "Mã NCC", FieldKind.Text, true, true),
                 new FieldConfig("tenncc", "Tên NCC", FieldKind.Text, true, false),
                 new FieldConfig("diachi", "Địa chỉ", FieldKind.Text, true, false),
                 new FieldConfig("sdt", "Điện thoại", FieldKind.Text, true, false)
-            }))));
+            }), GoHome)));
 
-            OpenHangHoaCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Open(new DanhMucWindow(new DanhMucConfig("DANH MỤC HÀNG HÓA", "tbldmhang", new List<FieldConfig>
+            OpenHangHoaCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Xe máy", new DanhMucWindow(new DanhMucConfig("DANH MỤC HÀNG HÓA", "tbldmhang", new List<FieldConfig>
             {
                 new FieldConfig("mahang", "Mã hàng", FieldKind.Text, true, true),
                 new FieldConfig("tenhang", "Tên hàng", FieldKind.Text, true, false),
@@ -74,34 +88,94 @@ namespace QLXeMay.ViewModels
                 new FieldConfig("soluong", "Số lượng", FieldKind.Number, true, false),
                 new FieldConfig("dongianhap", "Đơn giá nhập", FieldKind.Number, true, false),
                 new FieldConfig("dongiaban", "Đơn giá bán", FieldKind.Number, true, false)
-            }))));
+            }), GoHome)));
 
-            OpenTheLoaiCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => OpenCategory(TwoField("DANH MỤC THỂ LOẠI", "tbltheloai", "maloai", "Mã loại", "tenloai", "Tên loại")));
-            OpenMauSacCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => OpenCategory(TwoField("DANH MỤC MÀU SẮC", "tblmausac", "mamau", "Mã màu", "tenmau", "Tên màu")));
-            OpenHangSXCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => OpenCategory(TwoField("DANH MỤC HÃNG SẢN XUẤT", "tblhangsx", "mahangsx", "Mã hãng", "tenhangsx", "Tên hãng")));
-            OpenNuocSXCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => OpenCategory(TwoField("DANH MỤC NƯỚC SẢN XUẤT", "tblnuocsx", "manuocsx", "Mã nước", "tennuocsx", "Tên nước")));
-            OpenPhanhCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => OpenCategory(TwoField("DANH MỤC PHANH XE", "tblphanhxe", "maphanh", "Mã phanh", "tenphanh", "Tên phanh")));
-            OpenDongCoCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => OpenCategory(TwoField("DANH MỤC ĐỘNG CƠ", "tbldongco", "madongco", "Mã động cơ", "tendongco", "Tên động cơ")));
-            OpenTinhTrangCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => OpenCategory(TwoField("DANH MỤC TÌNH TRẠNG", "tbltinhtrang", "matt", "Mã tình trạng", "tentt", "Tên tình trạng")));
+            OpenTheLoaiCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Thể loại", new DanhMucWindow(TwoField("DANH MỤC THỂ LOẠI", "tbltheloai", "maloai", "Mã loại", "tenloai", "Tên loại"), GoHome)));
+            OpenMauSacCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Màu sắc", new DanhMucWindow(TwoField("DANH MỤC MÀU SẮC", "tblmausac", "mamau", "Mã màu", "tenmau", "Tên màu"), GoHome)));
+            OpenHangSXCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Hãng sản xuất", new DanhMucWindow(TwoField("DANH MỤC HÃNG SẢN XUẤT", "tblhangsx", "mahangsx", "Mã hãng", "tenhangsx", "Tên hãng"), GoHome)));
+            OpenNuocSXCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Nước sản xuất", new DanhMucWindow(TwoField("DANH MỤC NƯỚC SẢN XUẤT", "tblnuocsx", "manuocsx", "Mã nước", "tennuocsx", "Tên nước"), GoHome)));
+            OpenPhanhCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Phanh xe", new DanhMucWindow(TwoField("DANH MỤC PHANH XE", "tblphanhxe", "maphanh", "Mã phanh", "tenphanh", "Tên phanh"), GoHome)));
+            OpenDongCoCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Động cơ", new DanhMucWindow(TwoField("DANH MỤC ĐỘNG CƠ", "tbldongco", "madongco", "Mã động cơ", "tendongco", "Tên động cơ"), GoHome)));
+            OpenTinhTrangCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Tình trạng", new DanhMucWindow(TwoField("DANH MỤC TÌNH TRẠNG", "tbltinhtrang", "matt", "Mã tình trạng", "tentt", "Tên tình trạng"), GoHome)));
 
-            OpenHoaDonNhapCommand = CreateAuthorizedCommand(PermissionNames.PurchaseInvoice, () => Open(new HoaDonNhapWindow()));
-            OpenHoaDonBanCommand = CreateAuthorizedCommand(PermissionNames.SalesInvoice, () => Open(new HoaDonBanWindow()));
-            OpenTimHangCommand = CreateAuthorizedCommand(PermissionNames.Search, () => Open(new SearchWindow(SearchMode.Hang)));
-            OpenTimKhachHangCommand = CreateAuthorizedCommand(PermissionNames.Search, () => Open(new SearchWindow(SearchMode.KhachHang)));
-            OpenTimHDNCommand = CreateAuthorizedCommand(PermissionNames.Search, () => Open(new SearchWindow(SearchMode.HoaDonNhap)));
-            OpenTimDDHCommand = CreateAuthorizedCommand(PermissionNames.Search, () => Open(new SearchWindow(SearchMode.DonDatHang)));
-            OpenBaoCaoBanCommand = CreateAuthorizedCommand(PermissionNames.Reports, () => Open(new ReportWindow(ReportMode.BanHang)));
-            OpenBaoCaoNhapCommand = CreateAuthorizedCommand(PermissionNames.Reports, () => Open(new ReportWindow(ReportMode.NhapHang)));
-            OpenBaoCaoKQKDCommand = CreateAuthorizedCommand(PermissionNames.Reports, () => Open(new ReportWindow(ReportMode.KetQuaKinhDoanh)));
-            OpenBaoCaoTopCommand = CreateAuthorizedCommand(PermissionNames.Reports, () => Open(new ReportWindow(ReportMode.TopSanPham)));
-            OpenAiCommand = CreateAuthorizedCommand(PermissionNames.AiAssistant, () => Open(new AIAssistantWindow()));
-            OpenUserAdminCommand = CreateAuthorizedCommand(PermissionNames.UserAdmin, () => Open(new UserAdminWindow()));
+            OpenHoaDonNhapCommand = CreateAuthorizedCommand(PermissionNames.PurchaseInvoice, () => Show("Hóa đơn nhập hàng", new HoaDonNhapWindow(GoHome)));
+            OpenHoaDonBanCommand = CreateAuthorizedCommand(PermissionNames.SalesInvoice, () => Show("Hóa đơn bán hàng", new HoaDonBanWindow(GoHome)));
+            OpenTimHangCommand = CreateAuthorizedCommand(PermissionNames.Search, () => Show("Tìm kiếm", new SearchWindow(SearchMode.Hang, GoHome)));
+            OpenTimKhachHangCommand = CreateAuthorizedCommand(PermissionNames.Search, () => Show("Tìm kiếm khách hàng", new SearchWindow(SearchMode.KhachHang, GoHome)));
+            OpenTimHDNCommand = CreateAuthorizedCommand(PermissionNames.Search, () => Show("Tìm hóa đơn nhập", new SearchWindow(SearchMode.HoaDonNhap, GoHome)));
+            OpenTimDDHCommand = CreateAuthorizedCommand(PermissionNames.Search, () => Show("Tìm đơn đặt hàng", new SearchWindow(SearchMode.DonDatHang, GoHome)));
+            OpenBaoCaoBanCommand = CreateAuthorizedCommand(PermissionNames.Reports, () => Show("Báo cáo bán hàng", new ReportWindow(ReportMode.BanHang, GoHome)));
+            OpenBaoCaoNhapCommand = CreateAuthorizedCommand(PermissionNames.Reports, () => Show("Báo cáo nhập hàng", new ReportWindow(ReportMode.NhapHang, GoHome)));
+            OpenBaoCaoKQKDCommand = CreateAuthorizedCommand(PermissionNames.Reports, () => Show("Doanh thu", new ReportWindow(ReportMode.KetQuaKinhDoanh, GoHome)));
+            OpenBaoCaoTopCommand = CreateAuthorizedCommand(PermissionNames.Reports, () => Show("Top sản phẩm", new ReportWindow(ReportMode.TopSanPham, GoHome)));
+            OpenAiCommand = CreateAuthorizedCommand(PermissionNames.AiAssistant, () => Show("Trợ lý AI", new AIAssistantWindow()));
+            OpenUserAdminCommand = CreateAuthorizedCommand(PermissionNames.UserAdmin, () => Show("Quản trị tài khoản", new UserAdminWindow(GoHome)));
+            OpenAuditLogCommand = CreateAuthorizedCommand(PermissionNames.AuditLog, () => Show("Nhật ký hệ thống", new AuditLogWindow(GoHome)));
+            HomeCommand = new RelayCommand(_ => GoHome());
+            BackCommand = new RelayCommand(_ => GoHome());
             LogoutCommand = new RelayCommand(_ => Logout());
             ExitCommand = new RelayCommand(_ => Exit());
+
+            GoHome();
         }
 
         public string CurrentUserText => currentUser == null ? "Chưa đăng nhập" : currentUser.DisplayText;
         public string AccountMenuHeader => currentUser == null ? "Tài khoản" : "Tài khoản: " + currentUser.UserName;
+        public string RoleText => currentUser == null ? "" : currentUser.RoleDisplayName;
+
+        public object CurrentView
+        {
+            get => currentView;
+            private set => SetProperty(ref currentView, value);
+        }
+
+        public bool IsNotHome
+        {
+            get => isNotHome;
+            private set => SetProperty(ref isNotHome, value);
+        }
+
+        public string CurrentTitle
+        {
+            get => currentTitle;
+            private set => SetProperty(ref currentTitle, value);
+        }
+
+        public string RevenueText { get => revenueText; private set => SetProperty(ref revenueText, value); }
+        public string ProfitText { get => profitText; private set => SetProperty(ref profitText, value); }
+        public string OrderCountText { get => orderCountText; private set => SetProperty(ref orderCountText, value); }
+        public string StockText { get => stockText; private set => SetProperty(ref stockText, value); }
+        public string CustomerText { get => customerText; private set => SetProperty(ref customerText, value); }
+        public System.Collections.Generic.IReadOnlyList<RevenueBar> MonthlyRevenue
+        {
+            get => monthlyRevenue;
+            private set => SetProperty(ref monthlyRevenue, value);
+        }
+
+        private void LoadDashboard()
+        {
+            try
+            {
+                DashboardSnapshot s = new DashboardService().Load();
+                RevenueText = FormatMoney(s.Revenue);
+                ProfitText = FormatMoney(s.Profit);
+                OrderCountText = s.OrderCount.ToString("#,##0");
+                StockText = s.Stock.ToString("#,##0");
+                CustomerText = s.CustomerCount.ToString("#,##0");
+                MonthlyRevenue = s.MonthlyRevenue;
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Cannot load dashboard data.", ex);
+            }
+        }
+
+        private static string FormatMoney(double value)
+        {
+            if (value >= 1_000_000_000) return (value / 1_000_000_000).ToString("0.##") + " tỷ";
+            if (value >= 1_000_000) return (value / 1_000_000).ToString("0.#") + " tr";
+            return value.ToString("#,##0") + " đ";
+        }
 
         public ICommand OpenNhanVienCommand { get; }
         public ICommand OpenCongViecCommand { get; }
@@ -127,6 +201,9 @@ namespace QLXeMay.ViewModels
         public ICommand OpenBaoCaoTopCommand { get; }
         public ICommand OpenAiCommand { get; }
         public ICommand OpenUserAdminCommand { get; }
+        public ICommand OpenAuditLogCommand { get; }
+        public ICommand HomeCommand { get; }
+        public ICommand BackCommand { get; }
         public ICommand LogoutCommand { get; }
         public ICommand ExitCommand { get; }
 
@@ -151,22 +228,27 @@ namespace QLXeMay.ViewModels
             action();
         }
 
-        private void Open(Window window)
+        private void Show(string title, object view)
         {
             try
             {
-                windowService.ShowDialog(window);
+                CurrentView = view;
+                CurrentTitle = title;
+                IsNotHome = true;
             }
             catch (Exception ex)
             {
-                AppLogger.Error("Cannot open child window from main menu.", ex);
+                AppLogger.Error("Cannot show content view.", ex);
                 dialogService.ShowError("Không thể mở chức năng này.\n" + ex.Message);
+                GoHome();
             }
         }
 
-        private void OpenCategory(DanhMucConfig config)
+        private void GoHome()
         {
-            Open(new DanhMucWindow(config));
+            CurrentView = homeView;
+            CurrentTitle = "Bảng điều khiển";
+            IsNotHome = false;
         }
 
         private static DanhMucConfig TwoField(string title, string table, string key, string keyHeader, string name, string nameHeader)

@@ -11,19 +11,19 @@ using QLXeMay.ViewModels;
 
 namespace QLXeMay.Windows
 {
-    public partial class DanhMucWindow : Window
+    public partial class DanhMucWindow : UserControl
     {
         private readonly DanhMucConfig config;
         private readonly CategoryWindowViewModel viewModel;
         private readonly IDialogService dialogService;
         private readonly Dictionary<string, Control> controls = new Dictionary<string, Control>();
 
-        public DanhMucWindow(DanhMucConfig config)
-            : this(config, new CategoryService())
+        public DanhMucWindow(DanhMucConfig config, Action goBack)
+            : this(config, new CategoryService(), goBack)
         {
         }
 
-        internal DanhMucWindow(DanhMucConfig config, ICategoryService categoryService)
+        internal DanhMucWindow(DanhMucConfig config, ICategoryService categoryService, Action goBack)
         {
             InitializeComponent();
             this.config = config;
@@ -39,9 +39,8 @@ namespace QLXeMay.Windows
                 SetKeyEnabled,
                 ApplySelectedRow,
                 LoadComboBoxes,
-                Close);
+                goBack ?? (() => { }));
             DataContext = viewModel;
-            Title = config.Title;
             txtTitle.Text = config.Title;
             BuildFields();
             Loaded += (s, e) =>

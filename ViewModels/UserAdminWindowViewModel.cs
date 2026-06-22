@@ -18,6 +18,7 @@ namespace QLXeMay.ViewModels
         private string displayName;
         private string password;
         private bool isActive = true;
+        private string statusMessage;
 
         public UserAdminWindowViewModel(
             IAuthenticationService authenticationService,
@@ -32,8 +33,9 @@ namespace QLXeMay.ViewModels
             Roles = new ObservableCollection<RoleInfo>();
             RefreshCommand = new RelayCommand(_ => Load());
             CreateUserCommand = new RelayCommand(_ => CreateUser());
-            UpdateUserCommand = new RelayCommand(_ => UpdateUser());
-            ResetPasswordCommand = new RelayCommand(_ => ResetPassword());
+            UpdateUserCommand = new RelayCommand(_ => UpdateUser(), _ => SelectedUser != null);
+            ResetPasswordCommand = new RelayCommand(_ => ResetPassword(), _ => SelectedUser != null);
+            UnlockUserCommand = new RelayCommand(_ => UnlockUser(), _ => SelectedUser != null);
             ClearCommand = new RelayCommand(_ => ClearForm());
             CloseCommand = new RelayCommand(_ => closeAction());
 
@@ -50,6 +52,8 @@ namespace QLXeMay.ViewModels
             {
                 if (!SetProperty(ref selectedUser, value)) return;
                 ApplySelectedUser(value);
+                RaiseCommandState();
+                OnPropertyChanged(nameof(SelectedUserSummary));
             }
         }
 
@@ -83,10 +87,26 @@ namespace QLXeMay.ViewModels
             set => SetProperty(ref isActive, value);
         }
 
+        public string StatusMessage
+        {
+            get => statusMessage;
+            private set => SetProperty(ref statusMessage, value);
+        }
+
+        public string SelectedUserSummary
+        {
+            get
+            {
+                if (SelectedUser == null) return "Chưa chọn tài khoản.";
+                return SelectedUser.UserName + " - " + SelectedUser.StatusText + " - " + SelectedUser.SecurityNote;
+            }
+        }
+
         public ICommand RefreshCommand { get; }
         public ICommand CreateUserCommand { get; }
         public ICommand UpdateUserCommand { get; }
         public ICommand ResetPasswordCommand { get; }
+        public ICommand UnlockUserCommand { get; }
         public ICommand ClearCommand { get; }
         public ICommand CloseCommand { get; }
 
@@ -108,6 +128,9 @@ namespace QLXeMay.ViewModels
             {
                 SelectedRole = Roles[0];
             }
+
+            StatusMessage = "Đã tải " + Users.Count + " tài khoản.";
+            RaiseCommandState();
         }
 
         private void CreateUser()
@@ -115,12 +138,13 @@ namespace QLXeMay.ViewModels
             try
             {
                 authenticationService.CreateUser(NewUserName, DisplayName, Password, SelectedRole == null ? 0 : SelectedRole.RoleId, IsActive);
-                dialogService.ShowInformation("Đã tạo tài khoản mới.");
+                StatusMessage = "Đã tạo tài khoản mới. Người dùng sẽ phải đổi mật khẩu ở lần đăng nhập đầu tiên.";
                 ClearForm();
                 Load();
             }
             catch (Exception ex)
             {
+                StatusMessage = ex.Message;
                 dialogService.ShowWarning(ex.Message);
             }
         }
@@ -136,11 +160,12 @@ namespace QLXeMay.ViewModels
             try
             {
                 authenticationService.UpdateUser(SelectedUser.UserId, DisplayName, SelectedRole == null ? 0 : SelectedRole.RoleId, IsActive);
-                dialogService.ShowInformation("Đã cập nhật tài khoản.");
+                StatusMessage = "Đã cập nhật tài khoản.";
                 Load();
             }
             catch (Exception ex)
             {
+                StatusMessage = ex.Message;
                 dialogService.ShowWarning(ex.Message);
             }
         }
@@ -149,30 +174,57 @@ namespace QLXeMay.ViewModels
         {
             if (SelectedUser == null)
             {
-                dialogService.ShowWarning("Chọn tài khoản cần đổi mật khẩu.");
+                dialogService.ShowWarning("Chọn tài khoản cần đặt lại mật khẩu.");
                 return;
             }
 
             try
             {
                 authenticationService.ResetPassword(SelectedUser.UserId, Password);
-                dialogService.ShowInformation("Đã đặt lại mật khẩu.");
+                StatusMessage = "Đã đặt lại mật khẩu tạm. User sẽ phải đổi mật khẩu khi đăng nhập.";
                 Password = "";
+                Load();
             }
             catch (Exception ex)
             {
+                StatusMessage = ex.Message;
+                dialogService.ShowWarning(ex.Message);
+            }
+        }
+
+        private void UnlockUser()
+        {
+            if (SelectedUser == null)
+            {
+                dialogService.ShowWarning("Chọn tài khoản cần mở khóa.");
+                return;
+            }
+
+            try
+            {
+                authenticationService.UnlockUser(SelectedUser.UserId);
+                StatusMessage = "Đã mở khóa tài khoản.";
+                Load();
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = ex.Message;
                 dialogService.ShowWarning(ex.Message);
             }
         }
 
         private void ClearForm()
         {
-            SelectedUser = null;
+            selectedUser = null;
+            OnPropertyChanged(nameof(SelectedUser));
             NewUserName = "";
             DisplayName = "";
             Password = "";
             IsActive = true;
             if (Roles.Count > 0) SelectedRole = Roles[0];
+            StatusMessage = "Đang tạo tài khoản mới.";
+            OnPropertyChanged(nameof(SelectedUserSummary));
+            RaiseCommandState();
         }
 
         private void ApplySelectedUser(UserAccountInfo user)
@@ -191,6 +243,13 @@ namespace QLXeMay.ViewModels
                     break;
                 }
             }
+        }
+
+        private void RaiseCommandState()
+        {
+            (UpdateUserCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            (ResetPasswordCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            (UnlockUserCommand as RelayCommand)?.RaiseCanExecuteChanged();
         }
     }
 }
