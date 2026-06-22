@@ -1,0 +1,32 @@
+<Window x:Class="QLXeMay.Windows.ReportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding WindowTitle}" Height="660" Width="980" WindowStartupLocation="CenterOwner" Background="White">
+    <DockPanel Margin="12">
+        <TextBlock DockPanel.Dock="Top" Text="{Binding WindowTitle}" FontSize="22" FontWeight="Bold" Foreground="DarkGreen" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+            <Label Content="Từ ngày:" Visibility="{Binding DateFilterVisibility}"/>
+            <DatePicker Width="140" SelectedDate="{Binding DateFrom}" Visibility="{Binding DateFilterVisibility}"/>
+            <Label Content="Đến ngày:" Visibility="{Binding DateFilterVisibility}"/>
+            <DatePicker Width="140" SelectedDate="{Binding DateTo}" Visibility="{Binding DateFilterVisibility}"/>
+            <Label Content="Nhóm theo:" Visibility="{Binding GroupFilterVisibility}"/>
+            <ComboBox Width="160" ItemsSource="{Binding GroupOptions}" DisplayMemberPath="Name"
+                      SelectedItem="{Binding SelectedGroup}" Visibility="{Binding GroupFilterVisibility}"/>
+            <Button Content="Hiển thị" Command="{Binding ShowCommand}"/>
+            <Button Content="Xuất Excel" Command="{Binding ExportCommand}"/>
+            <Button Content="Đóng" Command="{Binding CloseCommand}"/>
+        </StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="160"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="{Binding SummaryText}" Margin="0,0,0,8" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap"/>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding MainView}" IsReadOnly="True" AutoGenerateColumns="True" CanUserAddRows="False"/>
+            <GroupBox Grid.Row="2" Header="Tổng hợp" Margin="0,8,0,0">
+                <DataGrid ItemsSource="{Binding SummaryView}" IsReadOnly="True" AutoGenerateColumns="True" CanUserAddRows="False"/>
+            </GroupBox>
+        </Grid>
+    </DockPanel>
+</Window>

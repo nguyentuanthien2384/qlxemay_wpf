@@ -1,0 +1,32 @@
+<Window x:Class="QLXeMay.Windows.DanhMucWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Danh mục" Height="680" Width="980" WindowStartupLocation="CenterOwner" Background="White">
+    <DockPanel Margin="12">
+        <TextBlock x:Name="txtTitle" DockPanel.Dock="Top" Text="DANH MỤC" FontSize="22" FontWeight="Bold"
+                   Foreground="DarkGreen" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+        <Border DockPanel.Dock="Bottom" BorderBrush="#DDDDDD" BorderThickness="1" Padding="8" Margin="0,8,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Thêm" Command="{Binding AddCommand}"/>
+                <Button Content="Lưu" Command="{Binding SaveCommand}"/>
+                <Button Content="Sửa" Command="{Binding UpdateCommand}"/>
+                <Button Content="Xóa" Command="{Binding DeleteCommand}"/>
+                <Button Content="Bỏ qua" Command="{Binding ResetCommand}"/>
+                <Button Content="Làm mới" Command="{Binding RefreshCommand}"/>
+                <Button Content="Đóng" Command="{Binding CloseCommand}"/>
+            </StackPanel>
+        </Border>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ScrollViewer Grid.Row="0" Height="215" VerticalScrollBarVisibility="Auto">
+                <UniformGrid x:Name="FieldsPanel" Columns="2" Margin="0,0,0,8"/>
+            </ScrollViewer>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding ItemsView}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                      IsReadOnly="True" AutoGenerateColumns="True" SelectionMode="Single"
+                      CanUserAddRows="False" CanUserDeleteRows="False"/>
+        </Grid>
+    </DockPanel>
+</Window>
