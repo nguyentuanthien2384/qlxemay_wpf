@@ -58,7 +58,7 @@ namespace QLXeMay.ViewModels
             CloseCommand = new RelayCommand(_ => closeAction());
 
             RefreshLookups();
-            IsInvoiceActive = false;
+            NewInvoice();
         }
 
         public DataView Employees { get; private set; }
@@ -232,17 +232,7 @@ namespace QLXeMay.ViewModels
 
         private void Reset()
         {
-            InvoiceNo = "";
-            SelectedEmployeeId = null;
-            SelectedSupplierId = null;
-            EmployeeName = "";
-            SupplierName = "";
-            SupplierAddress = "";
-            SupplierPhone = "";
-            ClearDetailInputs();
-            ApplyTotal(0);
-            DetailsView = null;
-            IsInvoiceActive = false;
+            NewInvoice();
         }
 
         private void Export()
