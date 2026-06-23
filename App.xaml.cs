@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using QLXeMay.Class;
+using QLXeMay.Domain;
 using QLXeMay.Infrastructure;
 using QLXeMay.Services;
 using QLXeMay.Windows;
@@ -34,7 +35,7 @@ namespace QLXeMay
                 authenticationService = new AuthenticationService();
                 authenticationService.EnsureSecuritySchema();
 
-                if (!ShowLoginAndMainWindow())
+                if (!ShowLoginAndShell())
                 {
                     Shutdown();
                 }
@@ -65,13 +66,13 @@ namespace QLXeMay
             currentWindow.Close();
             isSwitchingSession = false;
 
-            if (!ShowLoginAndMainWindow())
+            if (!ShowLoginAndShell())
             {
                 Shutdown();
             }
         }
 
-        private bool ShowLoginAndMainWindow()
+        private bool ShowLoginAndShell()
         {
             LoginWindow loginWindow = new LoginWindow(authenticationService);
             bool? loginResult = loginWindow.ShowDialog();
@@ -80,11 +81,22 @@ namespace QLXeMay
                 return false;
             }
 
-            MainWindow mainWindow = new MainWindow();
-            MainWindow = mainWindow;
-            mainWindow.Closed += HandleMainWindowClosed;
-            mainWindow.Show();
+            Window shell = CreateShellForCurrentUser();
+            MainWindow = shell;
+            shell.Closed += HandleMainWindowClosed;
+            shell.Show();
             return true;
+        }
+
+        private static Window CreateShellForCurrentUser()
+        {
+            // Self-service shoppers get the storefront; everyone else lands on the staff workspace.
+            if (AppSession.CurrentUser != null && AccessControl.IsCustomer(AppSession.CurrentUser.RoleName))
+            {
+                return new StorefrontWindow();
+            }
+
+            return new MainWindow();
         }
 
         private void HandleMainWindowClosed(object sender, EventArgs e)

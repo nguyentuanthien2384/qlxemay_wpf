@@ -96,5 +96,14 @@ namespace QLXeMay.Windows
             };
             window.ShowDialog();
         }
+
+        private void CustomerRegister_Click(object sender, RoutedEventArgs e)
+        {
+            CustomerRegisterWindow window = new CustomerRegisterWindow(authenticationService)
+            {
+                Owner = this
+            };
+            window.ShowDialog();
+        }
     }
 }
