@@ -123,6 +123,19 @@ namespace QLXeMay.ViewModels
         public string AccountMenuHeader => currentUser == null ? "Tài khoản" : "Tài khoản: " + currentUser.UserName;
         public string RoleText => currentUser == null ? "" : currentUser.RoleDisplayName;
 
+        // Visibility flags so the sidebar / home only show what the current role can use.
+        public bool CanManageEmployees => HasPermission(PermissionNames.ManageEmployees);
+        public bool CanManageCustomers => HasPermission(PermissionNames.ManageCustomers);
+        public bool CanManageSuppliers => HasPermission(PermissionNames.ManageSuppliers);
+        public bool CanManageProducts => HasPermission(PermissionNames.ManageProducts);
+        public bool CanSalesInvoice => HasPermission(PermissionNames.SalesInvoice);
+        public bool CanPurchaseInvoice => HasPermission(PermissionNames.PurchaseInvoice);
+        public bool CanSearch => HasPermission(PermissionNames.Search);
+        public bool CanReports => HasPermission(PermissionNames.Reports);
+        public bool CanAi => HasPermission(PermissionNames.AiAssistant);
+        public bool CanUserAdmin => HasPermission(PermissionNames.UserAdmin);
+        public bool CanAuditLog => HasPermission(PermissionNames.AuditLog);
+
         public object CurrentView
         {
             get => currentView;
