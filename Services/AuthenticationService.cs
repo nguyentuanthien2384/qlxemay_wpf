@@ -16,22 +16,6 @@ namespace QLXeMay.Services
         private const int MaxFailedLoginCount = 5;
         private const int LockoutMinutes = 15;
 
-        private static readonly string[] AllPermissions =
-        {
-            PermissionNames.ManageEmployees,
-            PermissionNames.ManageCatalog,
-            PermissionNames.ManageCustomers,
-            PermissionNames.ManageSuppliers,
-            PermissionNames.ManageProducts,
-            PermissionNames.SalesInvoice,
-            PermissionNames.PurchaseInvoice,
-            PermissionNames.Search,
-            PermissionNames.Reports,
-            PermissionNames.AiAssistant,
-            PermissionNames.UserAdmin,
-            PermissionNames.AuditLog
-        };
-
         public void EnsureSecuritySchema()
         {
             Function.ExecuteSql(@"
@@ -80,6 +64,7 @@ END");
             EnsureUserColumn("lockoutendat", "DATETIME NULL");
             EnsureUserColumn("mustchangepassword", "BIT NOT NULL CONSTRAINT DF_tblusers_mustchangepassword DEFAULT 0 WITH VALUES");
             EnsureUserColumn("passwordchangedat", "DATETIME NULL");
+            EnsureUserColumn("makhach", "CHAR(10) NULL");
 
             Function.ExecuteSql(@"
 IF OBJECT_ID(N'tblrolepermissions', N'U') IS NULL
@@ -109,6 +94,29 @@ END");
             SeedRoles();
             SeedRolePermissions();
             SeedDefaultUsers();
+            EnsureOnlineSalesActor();
+        }
+
+        /// <summary>
+        /// Self-service orders still need a real <c>manv</c> to satisfy the FK on tbldondathang,
+        /// so we seed a dedicated "online sales" employee (and its job) once the business tables exist.
+        /// </summary>
+        private static void EnsureOnlineSalesActor()
+        {
+            Function.ExecuteSql(@"
+IF OBJECT_ID(N'dbo.tblcongviec', N'U') IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM dbo.tblcongviec WHERE macv=@macv)
+    INSERT INTO dbo.tblcongviec(macv, tencv, luongthang) VALUES(@macv, N'Bán hàng trực tuyến', 0)",
+                Function.Param("@macv", AccessControl.OnlineSalesJobId));
+
+            Function.ExecuteSql(@"
+IF OBJECT_ID(N'dbo.tblnhanvien', N'U') IS NOT NULL
+   AND OBJECT_ID(N'dbo.tblcongviec', N'U') IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM dbo.tblnhanvien WHERE manv=@manv)
+    INSERT INTO dbo.tblnhanvien(manv, tennv, gioitinh, ngaysinh, sdt, diachi, macv)
+    VALUES(@manv, N'Hệ thống bán hàng trực tuyến', N'Khác', '2000-01-01', '0000000000', N'Trực tuyến', @macv)",
+                Function.Param("@manv", AccessControl.OnlineSalesEmployeeId),
+                Function.Param("@macv", AccessControl.OnlineSalesJobId));
         }
 
         public AuthenticationResult Authenticate(string userName, string password)
@@ -124,7 +132,7 @@ END");
                 DataTable table = Function.GetDataToTable(
                     @"SELECT TOP 1 u.userid, u.username, u.displayname, u.passwordhash, u.passwordsalt,
                              u.passworditerations, u.isactive, u.roleid, u.failedlogincount,
-                             u.lockoutendat, u.mustchangepassword,
+                             u.lockoutendat, u.mustchangepassword, u.makhach,
                              r.rolename, r.displayname AS roledisplayname
                       FROM tblusers u
                       INNER JOIN tblroles r ON u.roleid = r.roleid
@@ -177,13 +185,15 @@ END");
                 ResetLoginState(userId);
                 WriteAudit("LoginSuccess", normalizedUserName, userId, mustChangePassword ? "Must change password." : "OK.");
 
+                string customerId = row["makhach"] == DBNull.Value ? null : row["makhach"].ToString().Trim();
                 UserSession session = new UserSession(
                     userId,
                     row["username"].ToString(),
                     row["displayname"].ToString(),
                     row["rolename"].ToString(),
                     row["roledisplayname"].ToString(),
-                    LoadPermissionKeys(roleId));
+                    LoadPermissionKeys(roleId),
+                    customerId);
 
                 return AuthenticationResult.Success(session, mustChangePassword);
             }
@@ -295,6 +305,79 @@ END");
                 Function.Param("@iterations", passwordHash.Iterations),
                 Function.Param("@roleid", viewerRoleId));
             WriteAudit("UserRegistered", normalizedUserName, null, "Self-registration; waiting for admin activation.");
+        }
+
+        public string RegisterCustomer(string fullName, string phone, string address, string userName, string password)
+        {
+            string normalizedUserName = NormalizeUserName(userName);
+            string trimmedName = (fullName ?? string.Empty).Trim();
+            string trimmedPhone = (phone ?? string.Empty).Trim();
+            string trimmedAddress = (address ?? string.Empty).Trim();
+
+            ValidateUserInput(normalizedUserName, trimmedName, GetRoleId(AccessControl.Customer));
+            ValidatePasswordStrength(password, normalizedUserName, trimmedName);
+
+            if (string.IsNullOrWhiteSpace(trimmedPhone) || trimmedPhone.Length > 15)
+            {
+                throw new ArgumentException("Số điện thoại không hợp lệ (tối đa 15 ký tự).");
+            }
+
+            if (string.IsNullOrWhiteSpace(trimmedAddress) || trimmedAddress.Length > 100)
+            {
+                throw new ArgumentException("Địa chỉ không hợp lệ (tối đa 100 ký tự).");
+            }
+
+            if (Function.CheckKey("SELECT 1 FROM tblusers WHERE username=@username", Function.Param("@username", normalizedUserName)))
+            {
+                throw new InvalidOperationException("Tên đăng nhập đã tồn tại.");
+            }
+
+            string customerId = GenerateCustomerId();
+            PasswordHash passwordHash = PasswordHasher.Hash(password);
+            int customerRoleId = GetRoleId(AccessControl.Customer);
+
+            bool created = Function.ExecuteTransaction((connection, transaction) =>
+            {
+                Function.ExecuteSql(connection, transaction,
+                    "INSERT INTO tblkhachhang(makhach, tenkhach, diachi, sdt) VALUES(@makhach, @tenkhach, @diachi, @sdt)",
+                    Function.Param("@makhach", customerId),
+                    Function.Param("@tenkhach", trimmedName),
+                    Function.Param("@diachi", trimmedAddress),
+                    Function.Param("@sdt", trimmedPhone));
+
+                Function.ExecuteSql(connection, transaction,
+                    @"INSERT INTO tblusers(username, displayname, passwordhash, passwordsalt, passworditerations, roleid, isactive, failedlogincount, lockoutendat, mustchangepassword, passwordchangedat, makhach)
+                      VALUES(@username, @displayname, @hash, @salt, @iterations, @roleid, 1, 0, NULL, 0, GETDATE(), @makhach)",
+                    Function.Param("@username", normalizedUserName),
+                    Function.Param("@displayname", trimmedName),
+                    Function.Param("@hash", passwordHash.Hash),
+                    Function.Param("@salt", passwordHash.Salt),
+                    Function.Param("@iterations", passwordHash.Iterations),
+                    Function.Param("@roleid", customerRoleId),
+                    Function.Param("@makhach", customerId));
+            }, "Không thể tạo tài khoản khách hàng.");
+
+            if (!created)
+            {
+                throw new InvalidOperationException("Không thể tạo tài khoản khách hàng.");
+            }
+
+            WriteAudit("CustomerRegistered", normalizedUserName, null, "Customer self-registration; makhach=" + customerId + ".");
+            return customerId;
+        }
+
+        private static string GenerateCustomerId()
+        {
+            for (int attempt = 0; attempt < 20; attempt++)
+            {
+                string candidate = "KH" + Guid.NewGuid().ToString("N").Substring(0, 8).ToUpperInvariant();
+                if (!Function.CheckKey("SELECT 1 FROM tblkhachhang WHERE makhach=@makhach", Function.Param("@makhach", candidate)))
+                {
+                    return candidate;
+                }
+            }
+
+            throw new InvalidOperationException("Không thể tạo mã khách hàng mới. Vui lòng thử lại.");
         }
 
         public void UpdateUser(int userId, string displayName, int roleId, bool isActive)
@@ -454,6 +537,7 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_tblauditlog_eventtype
             EnsurePermission(PermissionNames.AiAssistant, "Sử dụng trợ lý AI");
             EnsurePermission(PermissionNames.UserAdmin, "Quản trị tài khoản");
             EnsurePermission(PermissionNames.AuditLog, "Xem nhật ký hệ thống");
+            EnsurePermission(PermissionNames.ShopOrder, "Mua hàng trực tuyến");
         }
 
         private static void SeedRoles()
@@ -463,44 +547,15 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_tblauditlog_eventtype
             EnsureRole("Sales", "Nhân viên bán hàng", "Bán hàng, khách hàng, tìm kiếm và báo cáo");
             EnsureRole("Warehouse", "Thủ kho", "Nhập hàng, nhà cung cấp, hàng hóa, tìm kiếm và báo cáo");
             EnsureRole("Viewer", "Chỉ xem báo cáo", "Chỉ tra cứu và xem báo cáo");
+            EnsureRole("Customer", "Khách hàng", "Tài khoản khách hàng tự đăng nhập và mua sản phẩm");
         }
 
         private static void SeedRolePermissions()
         {
-            EnsureRolePermissions("Administrator", AllPermissions);
-            EnsureRolePermissions("Manager", new[]
+            foreach (string roleName in AccessControl.AllRoleNames)
             {
-                PermissionNames.ManageCatalog,
-                PermissionNames.ManageCustomers,
-                PermissionNames.ManageSuppliers,
-                PermissionNames.ManageProducts,
-                PermissionNames.SalesInvoice,
-                PermissionNames.PurchaseInvoice,
-                PermissionNames.Search,
-                PermissionNames.Reports,
-                PermissionNames.AiAssistant
-            });
-            EnsureRolePermissions("Sales", new[]
-            {
-                PermissionNames.ManageCustomers,
-                PermissionNames.SalesInvoice,
-                PermissionNames.Search,
-                PermissionNames.Reports,
-                PermissionNames.AiAssistant
-            });
-            EnsureRolePermissions("Warehouse", new[]
-            {
-                PermissionNames.ManageSuppliers,
-                PermissionNames.ManageProducts,
-                PermissionNames.PurchaseInvoice,
-                PermissionNames.Search,
-                PermissionNames.Reports
-            });
-            EnsureRolePermissions("Viewer", new[]
-            {
-                PermissionNames.Search,
-                PermissionNames.Reports
-            });
+                EnsureRolePermissions(roleName, AccessControl.PermissionsFor(roleName));
+            }
         }
 
         private static void SeedDefaultUsers()
