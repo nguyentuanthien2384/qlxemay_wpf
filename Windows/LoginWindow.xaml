@@ -129,6 +129,8 @@
                                 <Button Grid.Column="1" Content="Thoát" Command="{Binding CancelCommand}"
                                         Height="40" Margin="5,0,0,0"/>
                             </Grid>
+                            <Button Content="🛒  Đăng ký tài khoản mua hàng" Click="CustomerRegister_Click"
+                                    Style="{StaticResource AccentButton}" Height="40" Margin="0,8,0,0"/>
                             <Border Background="{StaticResource AccentSoft}" BorderBrush="#BFDBFE" BorderThickness="1"
                                     CornerRadius="8" Padding="12" Margin="0,14,0,0">
                                 <TextBlock Text="{Binding HelperMessage}" Foreground="{StaticResource Muted}" TextWrapping="Wrap" FontSize="12"/>

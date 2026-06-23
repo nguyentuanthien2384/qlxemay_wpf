@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              FontFamily="Segoe UI" Background="{StaticResource Surface}">
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <Style x:Key="TileButton" TargetType="Button">
             <Setter Property="MinHeight" Value="96"/>
             <Setter Property="Margin" Value="0,0,16,16"/>
@@ -70,8 +71,8 @@
             <Border CornerRadius="14" Padding="28" Margin="0,0,0,22">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#1E293B" Offset="0"/>
-                        <GradientStop Color="#2563EB" Offset="1.4"/>
+                        <GradientStop Color="#6366F1" Offset="0"/>
+                        <GradientStop Color="#3B82F6" Offset="1"/>
                     </LinearGradientBrush>
                 </Border.Background>
                 <Grid>
@@ -85,12 +86,12 @@
                         <TextBlock Text="Theo dõi danh mục xe, kho hàng, đơn bán, khách hàng và doanh thu — tất cả trong một nơi."
                                    Foreground="#CBD5E1" FontSize="13.5" TextWrapping="Wrap" Margin="0,8,0,18" MaxWidth="520" HorizontalAlignment="Left"/>
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="＋ Lập đơn bán" Command="{Binding OpenHoaDonBanCommand}" Style="{StaticResource AccentButton}" Height="40" MinWidth="140" Margin="0,0,10,0"/>
-                            <Button Content="📦 Nhập hàng" Command="{Binding OpenHoaDonNhapCommand}" Height="40" MinWidth="130" Margin="0,0,10,0"/>
-                            <Button Content="🤖 Trợ lý AI" Command="{Binding OpenAiCommand}" Style="{StaticResource GhostButton}" Height="40" MinWidth="120" Foreground="White" BorderBrush="#475569" Background="#172033"/>
+                            <Button Content="＋ Lập đơn bán" Command="{Binding OpenHoaDonBanCommand}" Height="40" MinWidth="140" Margin="0,0,10,0" Foreground="#1D4ED8" Background="White" BorderBrush="White" Visibility="{Binding CanSalesInvoice, Converter={StaticResource BoolToVis}}"/>
+                            <Button Content="📦 Nhập hàng" Command="{Binding OpenHoaDonNhapCommand}" Style="{StaticResource GhostButton}" Height="40" MinWidth="130" Margin="0,0,10,0" Foreground="White" BorderBrush="#BFD2FB" Background="#3B82F6" Visibility="{Binding CanPurchaseInvoice, Converter={StaticResource BoolToVis}}"/>
+                            <Button Content="🤖 Trợ lý AI" Command="{Binding OpenAiCommand}" Style="{StaticResource GhostButton}" Height="40" MinWidth="120" Foreground="White" BorderBrush="#BFD2FB" Background="#3B82F6" Visibility="{Binding CanAi, Converter={StaticResource BoolToVis}}"/>
                         </StackPanel>
                     </StackPanel>
-                    <Border Grid.Column="1" Width="150" Height="150" CornerRadius="20" Background="#172033" Margin="20,0,0,0">
+                    <Border Grid.Column="1" Width="150" Height="150" CornerRadius="20" Background="#FFFFFF22" Margin="20,0,0,0">
                         <TextBlock Text="🏍" FontSize="84" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                 </Grid>
@@ -168,42 +169,42 @@
 
             <TextBlock Text="Chức năng chính" FontWeight="Bold" FontSize="16" Margin="2,0,0,14"/>
             <UniformGrid Columns="3">
-                <Button Command="{Binding OpenNhanVienCommand}" Style="{StaticResource TileButton}">
+                <Button Command="{Binding OpenNhanVienCommand}" Style="{StaticResource TileButton}" Visibility="{Binding CanManageEmployees, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
                         <TextBlock Text="👤" FontSize="22"/>
                         <TextBlock Text="Danh sách nhân viên" FontSize="15" FontWeight="Bold" Margin="0,8,0,0"/>
                         <TextBlock Text="Quản lý hồ sơ, công việc và liên hệ." TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12.5" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding OpenKhachHangCommand}" Style="{StaticResource TileButton}">
+                <Button Command="{Binding OpenKhachHangCommand}" Style="{StaticResource TileButton}" Visibility="{Binding CanManageCustomers, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
                         <TextBlock Text="👥" FontSize="22"/>
                         <TextBlock Text="Danh sách khách hàng" FontSize="15" FontWeight="Bold" Margin="0,8,0,0"/>
                         <TextBlock Text="Thông tin khách phục vụ bán hàng và tra cứu." TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12.5" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding OpenHangHoaCommand}" Style="{StaticResource TileButton}">
+                <Button Command="{Binding OpenHangHoaCommand}" Style="{StaticResource TileButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
                         <TextBlock Text="🏍" FontSize="22"/>
                         <TextBlock Text="Danh sách xe máy" FontSize="15" FontWeight="Bold" Margin="0,8,0,0"/>
                         <TextBlock Text="Thông số xe, tồn kho, giá nhập và giá bán." TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12.5" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding OpenTimHangCommand}" Style="{StaticResource TileButton}">
+                <Button Command="{Binding OpenTimHangCommand}" Style="{StaticResource TileButton}" Visibility="{Binding CanSearch, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
                         <TextBlock Text="🔍" FontSize="22"/>
                         <TextBlock Text="Tìm kiếm dữ liệu" FontSize="15" FontWeight="Bold" Margin="0,8,0,0"/>
                         <TextBlock Text="Tìm xe, khách hàng, hóa đơn nhập và đơn bán." TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12.5" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding OpenBaoCaoNhapCommand}" Style="{StaticResource TileButton}">
+                <Button Command="{Binding OpenBaoCaoNhapCommand}" Style="{StaticResource TileButton}" Visibility="{Binding CanReports, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
                         <TextBlock Text="📥" FontSize="22"/>
                         <TextBlock Text="Báo cáo nhập hàng" FontSize="15" FontWeight="Bold" Margin="0,8,0,0"/>
                         <TextBlock Text="Theo dõi nguồn hàng, chi phí và nhà cung cấp." TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12.5" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding OpenBaoCaoKQKDCommand}" Style="{StaticResource TileButton}">
+                <Button Command="{Binding OpenBaoCaoKQKDCommand}" Style="{StaticResource TileButton}" Visibility="{Binding CanReports, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
                         <TextBlock Text="📈" FontSize="22"/>
                         <TextBlock Text="Thông tin doanh thu" FontSize="15" FontWeight="Bold" Margin="0,8,0,0"/>
@@ -216,18 +217,18 @@
                 <StackPanel>
                     <TextBlock Text="Danh mục nhanh" FontSize="15" FontWeight="Bold"/>
                     <WrapPanel Margin="0,14,0,-8">
-                        <Button Content="Công việc" Command="{Binding OpenCongViecCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Nhà cung cấp" Command="{Binding OpenNhaCungCapCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Thể loại" Command="{Binding OpenTheLoaiCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Màu sắc" Command="{Binding OpenMauSacCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Hãng SX" Command="{Binding OpenHangSXCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Nước SX" Command="{Binding OpenNuocSXCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Phanh xe" Command="{Binding OpenPhanhCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Động cơ" Command="{Binding OpenDongCoCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Tình trạng" Command="{Binding OpenTinhTrangCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Top sản phẩm" Command="{Binding OpenBaoCaoTopCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Quản trị tài khoản" Command="{Binding OpenUserAdminCommand}" Style="{StaticResource ChipButton}"/>
-                        <Button Content="Nhật ký hệ thống" Command="{Binding OpenAuditLogCommand}" Style="{StaticResource ChipButton}"/>
+                        <Button Content="Công việc" Command="{Binding OpenCongViecCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageEmployees, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Nhà cung cấp" Command="{Binding OpenNhaCungCapCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageSuppliers, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Thể loại" Command="{Binding OpenTheLoaiCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Màu sắc" Command="{Binding OpenMauSacCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Hãng SX" Command="{Binding OpenHangSXCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Nước SX" Command="{Binding OpenNuocSXCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Phanh xe" Command="{Binding OpenPhanhCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Động cơ" Command="{Binding OpenDongCoCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Tình trạng" Command="{Binding OpenTinhTrangCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Top sản phẩm" Command="{Binding OpenBaoCaoTopCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanReports, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Quản trị tài khoản" Command="{Binding OpenUserAdminCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanUserAdmin, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Nhật ký hệ thống" Command="{Binding OpenAuditLogCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanAuditLog, Converter={StaticResource BoolToVis}}"/>
                     </WrapPanel>
                 </StackPanel>
             </Border>

@@ -14,7 +14,7 @@
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FontSize" Value="13.5"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{StaticResource BrandText}"/>
+            <Setter Property="Foreground" Value="#475569"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Template">
@@ -28,12 +28,12 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="#334155"/>
+                                <Setter TargetName="Chrome" Property="Background" Value="#EEF2FB"/>
                                 <Setter TargetName="Bar" Property="Opacity" Value="1"/>
-                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Setter Property="Foreground" Value="#1D4ED8"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="#475569"/>
+                                <Setter Property="Foreground" Value="#CBD5E1"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -49,48 +49,50 @@
         </Grid.ColumnDefinitions>
 
         <!-- ===== Sidebar ===== -->
-        <Border Grid.Column="0">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#1E293B" Offset="0"/>
-                    <GradientStop Color="#0F172A" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
+        <Border Grid.Column="0" Background="{StaticResource Card}" BorderBrush="{StaticResource Border}" BorderThickness="0,0,1,0">
             <DockPanel Margin="14,18">
                 <StackPanel DockPanel.Dock="Top">
                     <Button Command="{Binding HomeCommand}" Style="{StaticResource SideNavButton}" Height="Auto" Margin="0,0,0,18" Padding="4,0">
                         <StackPanel Orientation="Horizontal">
-                            <Border Width="40" Height="40" CornerRadius="10" Background="#2563EB">
+                            <Border Width="40" Height="40" CornerRadius="10">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#6366F1" Offset="0"/>
+                                        <GradientStop Color="#2563EB" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
                                 <TextBlock Text="🏍" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
-                                <TextBlock Text="MOTO MANAGER" Foreground="White" FontWeight="Bold" FontSize="13"/>
-                                <TextBlock Text="Cửa hàng xe máy" Foreground="{StaticResource BrandMuted}" FontSize="11"/>
+                                <TextBlock Text="MOTO MANAGER" Foreground="{StaticResource Ink}" FontWeight="Bold" FontSize="13"/>
+                                <TextBlock Text="Cửa hàng xe máy" Foreground="{StaticResource Muted}" FontSize="11"/>
                             </StackPanel>
                         </StackPanel>
                     </Button>
 
-                    <Border Background="#172033" CornerRadius="10" Padding="12" Margin="0,0,0,16">
+                    <Border Background="{StaticResource AccentSoft}" BorderBrush="#DBE5FB" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,16">
                         <StackPanel>
-                            <TextBlock Text="Đang đăng nhập" Foreground="{StaticResource BrandMuted}" FontSize="11"/>
-                            <TextBlock Text="{Binding CurrentUserText}" Foreground="White" TextWrapping="Wrap" FontWeight="SemiBold" FontSize="12.5" Margin="0,3,0,0"/>
+                            <TextBlock Text="Đang đăng nhập" Foreground="{StaticResource Muted}" FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentUserText}" Foreground="{StaticResource AccentPressed}" TextWrapping="Wrap" FontWeight="SemiBold" FontSize="12.5" Margin="0,3,0,0"/>
                         </StackPanel>
                     </Border>
 
-                    <TextBlock Text="NGHIỆP VỤ" Foreground="{StaticResource BrandMuted}" FontSize="10.5" FontWeight="Bold" Margin="6,0,0,8"/>
+                    <TextBlock Text="NGHIỆP VỤ" Foreground="{StaticResource Muted}" FontSize="10.5" FontWeight="Bold" Margin="6,0,0,8"/>
                     <Button Command="{Binding HomeCommand}" Style="{StaticResource SideNavButton}" Content="🏠   Trang chủ"/>
-                    <Button Command="{Binding OpenNhanVienCommand}" Style="{StaticResource SideNavButton}" Content="👤   Nhân viên"/>
-                    <Button Command="{Binding OpenKhachHangCommand}" Style="{StaticResource SideNavButton}" Content="👥   Khách hàng"/>
-                    <Button Command="{Binding OpenHangHoaCommand}" Style="{StaticResource SideNavButton}" Content="🏍   Xe máy"/>
-                    <Button Command="{Binding OpenHoaDonBanCommand}" Style="{StaticResource SideNavButton}" Content="🧾   Bán hàng"/>
-                    <Button Command="{Binding OpenHoaDonNhapCommand}" Style="{StaticResource SideNavButton}" Content="📦   Nhập hàng"/>
-                    <Button Command="{Binding OpenBaoCaoKQKDCommand}" Style="{StaticResource SideNavButton}" Content="📊   Doanh thu"/>
+                    <Button Command="{Binding OpenNhanVienCommand}" Style="{StaticResource SideNavButton}" Content="👤   Nhân viên" Visibility="{Binding CanManageEmployees, Converter={StaticResource BoolToVis}}"/>
+                    <Button Command="{Binding OpenKhachHangCommand}" Style="{StaticResource SideNavButton}" Content="👥   Khách hàng" Visibility="{Binding CanManageCustomers, Converter={StaticResource BoolToVis}}"/>
+                    <Button Command="{Binding OpenHangHoaCommand}" Style="{StaticResource SideNavButton}" Content="🏍   Xe máy" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                    <Button Command="{Binding OpenHoaDonBanCommand}" Style="{StaticResource SideNavButton}" Content="🧾   Bán hàng" Visibility="{Binding CanSalesInvoice, Converter={StaticResource BoolToVis}}"/>
+                    <Button Command="{Binding OpenHoaDonNhapCommand}" Style="{StaticResource SideNavButton}" Content="📦   Nhập hàng" Visibility="{Binding CanPurchaseInvoice, Converter={StaticResource BoolToVis}}"/>
+                    <Button Command="{Binding OpenTimHangCommand}" Style="{StaticResource SideNavButton}" Content="🔍   Tìm kiếm" Visibility="{Binding CanSearch, Converter={StaticResource BoolToVis}}"/>
+                    <Button Command="{Binding OpenBaoCaoKQKDCommand}" Style="{StaticResource SideNavButton}" Content="📊   Doanh thu" Visibility="{Binding CanReports, Converter={StaticResource BoolToVis}}"/>
+                    <Button Command="{Binding OpenAiCommand}" Style="{StaticResource SideNavButton}" Content="🤖   Trợ lý AI" Visibility="{Binding CanAi, Converter={StaticResource BoolToVis}}"/>
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Bottom">
-                    <Border Height="1" Background="#334155" Margin="0,0,0,8"/>
-                    <Button Content="🛡   Quản trị TK" Command="{Binding OpenUserAdminCommand}" Style="{StaticResource SideNavButton}"/>
-                    <Button Content="📜   Nhật ký" Command="{Binding OpenAuditLogCommand}" Style="{StaticResource SideNavButton}"/>
+                    <Border Height="1" Background="{StaticResource Border}" Margin="0,0,0,8"/>
+                    <Button Content="🛡   Quản trị TK" Command="{Binding OpenUserAdminCommand}" Style="{StaticResource SideNavButton}" Visibility="{Binding CanUserAdmin, Converter={StaticResource BoolToVis}}"/>
+                    <Button Content="📜   Nhật ký" Command="{Binding OpenAuditLogCommand}" Style="{StaticResource SideNavButton}" Visibility="{Binding CanAuditLog, Converter={StaticResource BoolToVis}}"/>
                     <Button Content="↪   Đăng xuất" Command="{Binding LogoutCommand}" Style="{StaticResource SideNavButton}"/>
                     <Button Content="✕   Thoát" Command="{Binding ExitCommand}" Style="{StaticResource SideNavButton}"/>
                 </StackPanel>

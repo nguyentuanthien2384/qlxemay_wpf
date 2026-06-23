@@ -1,31 +1,27 @@
 <UserControl x:Class="QLXeMay.Windows.HoaDonBanWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#F1F5F9" FontFamily="Segoe UI">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="{StaticResource Surface}" FontFamily="Segoe UI">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="Panel" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="Line" Color="#E2E8F0"/>
-        <Style x:Key="Cmd" TargetType="{x:Type Button}">
+        <Style x:Key="Cmd" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Height" Value="34"/>
             <Setter Property="MinWidth" Value="96"/>
             <Setter Property="Margin" Value="4"/>
-            <Setter Property="Background" Value="#F8FAFC"/>
-            <Setter Property="BorderBrush" Value="#E2E8F0"/>
         </Style>
     </UserControl.Resources>
     <DockPanel Margin="18">
-        <Border DockPanel.Dock="Top" Background="#FFFFFF" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="10" Margin="0,0,0,12">
-            <TextBlock Text="HÓA ĐƠN BÁN HÀNG" FontSize="22" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
+        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="10" Margin="0,0,0,12">
+            <TextBlock Text="HÓA ĐƠN BÁN HÀNG" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Ink}" HorizontalAlignment="Center"/>
         </Border>
-        <Border DockPanel.Dock="Bottom" Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="10" Margin="0,12,0,0">
+        <Border DockPanel.Dock="Bottom" Style="{StaticResource CardBorder}" Padding="10" Margin="0,12,0,0">
             <StackPanel>
                 <WrapPanel>
                     <Label Content="Tổng tiền:" FontWeight="Bold"/><TextBlock Text="{Binding Total}" Margin="4" FontWeight="Bold" VerticalAlignment="Center"/>
                     <Label Content="Thuế:" Margin="24,0,0,0"/><TextBlock Text="{Binding Tax}" Margin="4" VerticalAlignment="Center"/>
                     <Label Content="Đặt cọc:" Margin="24,0,0,0"/><TextBlock Text="{Binding Deposit}" Margin="4" VerticalAlignment="Center"/>
-                    <Label Content="Bằng chữ:" Margin="24,0,0,0"/><TextBlock Text="{Binding AmountInWords}" Margin="4" FontStyle="Italic" Foreground="#1E40AF" VerticalAlignment="Center"/>
+                    <Label Content="Bằng chữ:" Margin="24,0,0,0"/><TextBlock Text="{Binding AmountInWords}" Margin="4" FontStyle="Italic" Foreground="{StaticResource AccentPressed}" VerticalAlignment="Center"/>
                 </WrapPanel>
                 <WrapPanel HorizontalAlignment="Center" Margin="0,6,0,0">
-                    <Button Content="Thêm hóa đơn" Command="{Binding NewInvoiceCommand}" Style="{StaticResource Cmd}" Background="#2563EB" BorderBrush="#1D4ED8" Foreground="White"/>
+                    <Button Content="Thêm hóa đơn" Command="{Binding NewInvoiceCommand}" Style="{StaticResource AccentButton}" MinWidth="120"/>
                     <Button Content="Lưu mặt hàng" Command="{Binding SaveLineCommand}" Style="{StaticResource Cmd}"/>
                     <Button Content="Xóa dòng" Command="{Binding DeleteLineCommand}" Style="{StaticResource Cmd}"/>
                     <Button Content="Bỏ qua" Command="{Binding ResetCommand}" Style="{StaticResource Cmd}"/>
@@ -42,7 +38,7 @@
         </Border>
         <Grid>
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-            <GroupBox Header="Thông tin chung" Grid.Row="0" Margin="0,0,0,8" Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}">
+            <GroupBox Header="Thông tin chung" Grid.Row="0">
                 <UniformGrid Columns="4" Margin="10">
                     <StackPanel><Label Content="Mã hóa đơn bán"/><TextBox Text="{Binding InvoiceNo, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
                     <StackPanel><Label Content="Ngày mua"/><DatePicker SelectedDate="{Binding InvoiceDate}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
@@ -54,7 +50,7 @@
                     <StackPanel><Label Content="Điện thoại"/><TextBox Text="{Binding CustomerPhone, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
                 </UniformGrid>
             </GroupBox>
-            <GroupBox Header="Thông tin mặt hàng" Grid.Row="1" Margin="0,0,0,8" Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}">
+            <GroupBox Header="Thông tin mặt hàng" Grid.Row="1">
                 <UniformGrid Columns="5" Margin="10">
                     <StackPanel><Label Content="Mã hàng"/><ComboBox ItemsSource="{Binding Products}" SelectedValuePath="mahang" DisplayMemberPath="mahang" SelectedValue="{Binding SelectedProductId, Mode=TwoWay}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
                     <StackPanel><Label Content="Tên hàng"/><TextBox Text="{Binding ProductName, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
@@ -63,8 +59,8 @@
                     <StackPanel><Label Content="Thành tiền"/><TextBox Text="{Binding LineTotal, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
                 </UniformGrid>
             </GroupBox>
-            <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="10">
-                <DataGrid ItemsSource="{Binding DetailsView}" SelectedItem="{Binding SelectedDetail, Mode=TwoWay}" IsReadOnly="True" AutoGenerateColumns="True" CanUserAddRows="False" AlternatingRowBackground="#F8FAFC"/>
+            <Border Grid.Row="2" Style="{StaticResource CardBorder}" Padding="10">
+                <DataGrid ItemsSource="{Binding DetailsView}" SelectedItem="{Binding SelectedDetail, Mode=TwoWay}" IsReadOnly="True" AutoGenerateColumns="True" CanUserAddRows="False"/>
             </Border>
         </Grid>
     </DockPanel>

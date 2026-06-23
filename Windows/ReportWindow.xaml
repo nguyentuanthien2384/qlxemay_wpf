@@ -1,23 +1,19 @@
 <UserControl x:Class="QLXeMay.Windows.ReportWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#F1F5F9" FontFamily="Segoe UI">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="{StaticResource Surface}" FontFamily="Segoe UI">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="Panel" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="Line" Color="#E2E8F0"/>
-        <Style x:Key="Cmd" TargetType="{x:Type Button}">
+        <Style x:Key="Cmd" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Height" Value="34"/>
             <Setter Property="MinWidth" Value="100"/>
             <Setter Property="Margin" Value="4"/>
-            <Setter Property="Background" Value="#F8FAFC"/>
-            <Setter Property="BorderBrush" Value="#E2E8F0"/>
         </Style>
     </UserControl.Resources>
     <DockPanel Margin="18">
-        <Border DockPanel.Dock="Top" Background="#FFFFFF" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="10" Margin="0,0,0,12">
-            <TextBlock Text="{Binding WindowTitle}" FontSize="22" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
+        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="10" Margin="0,0,0,12">
+            <TextBlock Text="{Binding WindowTitle}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Ink}" HorizontalAlignment="Center"/>
         </Border>
 
-        <Border DockPanel.Dock="Top" Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="12" Margin="0,0,0,12">
+        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,12">
             <WrapPanel HorizontalAlignment="Center">
                 <Label Content="Từ ngày:" Visibility="{Binding DateFilterVisibility}"/>
                 <DatePicker Width="140" SelectedDate="{Binding DateFrom}" Visibility="{Binding DateFilterVisibility}"/>
@@ -25,7 +21,7 @@
                 <DatePicker Width="140" SelectedDate="{Binding DateTo}" Visibility="{Binding DateFilterVisibility}"/>
                 <Label Content="Nhóm theo:" Visibility="{Binding GroupFilterVisibility}"/>
                 <ComboBox Width="160" ItemsSource="{Binding GroupOptions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedGroup}" Visibility="{Binding GroupFilterVisibility}"/>
-                <Button Content="Hiển thị" Command="{Binding ShowCommand}" Style="{StaticResource Cmd}" Background="#2563EB" BorderBrush="#1D4ED8" Foreground="White"/>
+                <Button Content="Hiển thị" Command="{Binding ShowCommand}" Style="{StaticResource AccentButton}" MinWidth="100"/>
                 <Button Content="Xuất Excel" Command="{Binding ExportCommand}" Style="{StaticResource Cmd}"/>
                 <Button Content="Đóng" Command="{Binding CloseCommand}" Style="{StaticResource Cmd}"/>
             </WrapPanel>
@@ -37,13 +33,13 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="170"/>
             </Grid.RowDefinitions>
-            <Border Grid.Row="0" Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="10" Margin="0,0,0,10">
+            <Border Grid.Row="0" Style="{StaticResource CardBorder}" Padding="10" Margin="0,0,0,10">
                 <TextBlock Text="{Binding SummaryText}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap"/>
             </Border>
-            <Border Grid.Row="1" Background="#F8FAFC" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="10">
-                <DataGrid ItemsSource="{Binding MainView}" IsReadOnly="True" AutoGenerateColumns="True" CanUserAddRows="False" AlternatingRowBackground="#F8FAFC"/>
+            <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="10">
+                <DataGrid ItemsSource="{Binding MainView}" IsReadOnly="True" AutoGenerateColumns="True" CanUserAddRows="False"/>
             </Border>
-            <GroupBox Grid.Row="2" Header="Tổng hợp" Margin="0,10,0,0" Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}">
+            <GroupBox Grid.Row="2" Header="Tổng hợp" Margin="0,10,0,0">
                 <DataGrid ItemsSource="{Binding SummaryView}" IsReadOnly="True" AutoGenerateColumns="True" CanUserAddRows="False"/>
             </GroupBox>
         </Grid>
