@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using QLXeMay.Infrastructure;
 using QLXeMay.Class;
 using QLXeMay.Models;
 using QLXeMay.Services;
@@ -58,18 +59,29 @@ namespace QLXeMay.Windows
 
             foreach (FieldConfig f in config.Fields)
             {
-                Grid grid = new Grid { Margin = new Thickness(4) };
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(145) });
+                Grid grid = new Grid { Margin = new Thickness(0, 0, 0, 10) };
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(155) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-                Label label = new Label { Content = f.Header + (f.Required ? " *" : "") };
+                Label label = new Label
+                {
+                    Content = f.Header + (f.Required ? " *" : string.Empty),
+                    FontWeight = FontWeights.SemiBold,
+                    Padding = new Thickness(0),
+                    Margin = new Thickness(0, 0, 12, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
                 Grid.SetColumn(label, 0);
                 grid.Children.Add(label);
 
                 Control input;
                 if (f.Kind == FieldKind.Date)
                 {
-                    input = new DatePicker { SelectedDate = DateTime.Today };
+                    input = new DatePicker
+                    {
+                        SelectedDate = DateTime.Today,
+                        SelectedDateFormat = DatePickerFormat.Short
+                    };
                 }
                 else if (f.Kind == FieldKind.Combo)
                 {
@@ -79,10 +91,27 @@ namespace QLXeMay.Windows
                 {
                     input = new TextBox();
                 }
+
+                input.Margin = new Thickness(0);
+                input.Height = 38;
+                input.MinWidth = 210;
+                input.HorizontalAlignment = HorizontalAlignment.Stretch;
+
                 Grid.SetColumn(input, 1);
                 grid.Children.Add(input);
                 FieldsPanel.Children.Add(grid);
                 controls[f.ColumnName] = input;
+            }
+        }
+
+
+        private void CategoryGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            GridHeaderFormatter.Apply(sender, e);
+            FieldConfig field = config.Fields.FirstOrDefault(f => string.Equals(f.ColumnName, e.PropertyName, StringComparison.OrdinalIgnoreCase));
+            if (field != null)
+            {
+                e.Column.Header = field.Header;
             }
         }
 

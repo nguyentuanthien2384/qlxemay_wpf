@@ -62,7 +62,7 @@ namespace QLXeMay.Class
                 int headerRow = 3;
                 for (int c = 0; c < table.Columns.Count; c++)
                 {
-                    exSheet.Cells[headerRow, c + 1].Value = table.Columns[c].ColumnName;
+                    exSheet.Cells[headerRow, c + 1].Value = GridHeaderFormatter.Format(table.Columns[c].ColumnName);
                     exSheet.Cells[headerRow, c + 1].Font.Bold = true;
                     exSheet.Cells[headerRow, c + 1].Borders.LineStyle = 1;
                     exSheet.Cells[headerRow, c + 1].HorizontalAlignment = -4108;

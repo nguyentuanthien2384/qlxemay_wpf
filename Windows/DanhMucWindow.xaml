@@ -3,46 +3,52 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="{StaticResource Surface}" FontFamily="Segoe UI">
     <UserControl.Resources>
         <Style x:Key="Cmd" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="MinWidth" Value="92"/>
-            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="102"/>
+            <Setter Property="Margin" Value="5"/>
         </Style>
     </UserControl.Resources>
     <DockPanel Margin="18">
-        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="10" Margin="0,0,0,12">
+        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,12">
             <TextBlock x:Name="txtTitle" Text="DANH MỤC" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Ink}" HorizontalAlignment="Center"/>
         </Border>
 
         <Border DockPanel.Dock="Bottom" Style="{StaticResource CardBorder}" Padding="10" Margin="0,12,0,0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Thêm" Command="{Binding AddCommand}" Style="{StaticResource AccentButton}" MinWidth="100"/>
+            <WrapPanel HorizontalAlignment="Center">
+                <Button Content="Thêm" Command="{Binding AddCommand}" Style="{StaticResource AccentButton}" MinWidth="110" Height="36"/>
                 <Button Content="Lưu" Command="{Binding SaveCommand}" Style="{StaticResource Cmd}"/>
                 <Button Content="Sửa" Command="{Binding UpdateCommand}" Style="{StaticResource Cmd}"/>
                 <Button Content="Xóa" Command="{Binding DeleteCommand}" Style="{StaticResource Cmd}"/>
                 <Button Content="Bỏ qua" Command="{Binding ResetCommand}" Style="{StaticResource Cmd}"/>
                 <Button Content="Làm mới" Command="{Binding RefreshCommand}" Style="{StaticResource Cmd}"/>
                 <Button Content="Đóng" Command="{Binding CloseCommand}" Style="{StaticResource Cmd}"/>
-            </StackPanel>
+            </WrapPanel>
         </Border>
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="360"/>
+                <ColumnDefinition Width="430"/>
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Style="{StaticResource CardBorder}" Padding="12">
+            <Border Grid.Column="0" Style="{StaticResource CardBorder}" Padding="18">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="Thông tin" FontSize="18" FontWeight="Bold" Margin="4,0,0,8"/>
-                        <UniformGrid x:Name="FieldsPanel" Columns="1"/>
+                        <TextBlock Text="Thông tin chi tiết" FontSize="18" FontWeight="Bold" Margin="0,0,0,14"/>
+                        <StackPanel x:Name="FieldsPanel"/>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
             <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="10">
-                <DataGrid ItemsSource="{Binding ItemsView}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
-                          IsReadOnly="True" AutoGenerateColumns="True" SelectionMode="Single"
-                          CanUserAddRows="False" CanUserDeleteRows="False"/>
+                <DataGrid x:Name="CategoryGrid"
+                          ItemsSource="{Binding ItemsView}"
+                          SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                          IsReadOnly="True"
+                          AutoGenerateColumns="True"
+                          AutoGeneratingColumn="CategoryGrid_AutoGeneratingColumn"
+                          SelectionMode="Single"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"/>
             </Border>
         </Grid>
     </DockPanel>

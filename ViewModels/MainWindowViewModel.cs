@@ -48,7 +48,7 @@ namespace QLXeMay.ViewModels
                 new FieldConfig("tennv", "Tên nhân viên", FieldKind.Text, true, false),
                 new FieldConfig("gioitinh", "Giới tính", FieldKind.Text, true, false),
                 new FieldConfig("ngaysinh", "Ngày sinh", FieldKind.Date, true, false),
-                new FieldConfig("sdt", "Điện thoại", FieldKind.Text, true, false),
+                new FieldConfig("sdt", "Số điện thoại", FieldKind.Text, true, false),
                 new FieldConfig("diachi", "Địa chỉ", FieldKind.Text, true, false),
                 new FieldConfig("macv", "Công việc", FieldKind.Combo, true, false,
                     "SELECT macv, macv + ' - ' + tencv AS hienthi FROM tblcongviec", "macv", "hienthi")
@@ -56,35 +56,35 @@ namespace QLXeMay.ViewModels
 
             OpenKhachHangCommand = CreateAuthorizedCommand(PermissionNames.ManageCustomers, () => Show("Khách hàng", new DanhMucWindow(new DanhMucConfig("DANH MỤC KHÁCH HÀNG", "tblkhachhang", new List<FieldConfig>
             {
-                new FieldConfig("makhach", "Mã khách", FieldKind.Text, true, true),
-                new FieldConfig("tenkhach", "Tên khách", FieldKind.Text, true, false),
+                new FieldConfig("makhach", "Mã khách hàng", FieldKind.Text, true, true),
+                new FieldConfig("tenkhach", "Tên khách hàng", FieldKind.Text, true, false),
                 new FieldConfig("diachi", "Địa chỉ", FieldKind.Text, true, false),
-                new FieldConfig("sdt", "Điện thoại", FieldKind.Text, true, false)
+                new FieldConfig("sdt", "Số điện thoại", FieldKind.Text, true, false)
             }), GoHome)));
 
             OpenNhaCungCapCommand = CreateAuthorizedCommand(PermissionNames.ManageSuppliers, () => Show("Nhà cung cấp", new DanhMucWindow(new DanhMucConfig("DANH MỤC NHÀ CUNG CẤP", "tblnhacungcap", new List<FieldConfig>
             {
-                new FieldConfig("mancc", "Mã NCC", FieldKind.Text, true, true),
-                new FieldConfig("tenncc", "Tên NCC", FieldKind.Text, true, false),
+                new FieldConfig("mancc", "Mã nhà cung cấp", FieldKind.Text, true, true),
+                new FieldConfig("tenncc", "Tên nhà cung cấp", FieldKind.Text, true, false),
                 new FieldConfig("diachi", "Địa chỉ", FieldKind.Text, true, false),
-                new FieldConfig("sdt", "Điện thoại", FieldKind.Text, true, false)
+                new FieldConfig("sdt", "Số điện thoại", FieldKind.Text, true, false)
             }), GoHome)));
 
             OpenHangHoaCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Xe máy", new DanhMucWindow(new DanhMucConfig("DANH MỤC HÀNG HÓA", "tbldmhang", new List<FieldConfig>
             {
-                new FieldConfig("mahang", "Mã hàng", FieldKind.Text, true, true),
-                new FieldConfig("tenhang", "Tên hàng", FieldKind.Text, true, false),
+                new FieldConfig("mahang", "Mã xe", FieldKind.Text, true, true),
+                new FieldConfig("tenhang", "Tên xe", FieldKind.Text, true, false),
                 new FieldConfig("maloai", "Thể loại", FieldKind.Combo, true, false, "SELECT maloai, maloai + ' - ' + tenloai AS ht FROM tbltheloai", "maloai", "ht"),
-                new FieldConfig("mahangsx", "Hãng SX", FieldKind.Combo, true, false, "SELECT mahangsx, mahangsx + ' - ' + tenhangsx AS ht FROM tblhangsx", "mahangsx", "ht"),
+                new FieldConfig("mahangsx", "Hãng sản xuất", FieldKind.Combo, true, false, "SELECT mahangsx, mahangsx + ' - ' + tenhangsx AS ht FROM tblhangsx", "mahangsx", "ht"),
                 new FieldConfig("mamau", "Màu", FieldKind.Combo, true, false, "SELECT mamau, mamau + ' - ' + tenmau AS ht FROM tblmausac", "mamau", "ht"),
-                new FieldConfig("namsx", "Năm SX", FieldKind.Number, true, false),
+                new FieldConfig("namsx", "Năm sản xuất", FieldKind.Number, true, false),
                 new FieldConfig("maphanh", "Phanh", FieldKind.Combo, true, false, "SELECT maphanh, maphanh + ' - ' + tenphanh AS ht FROM tblphanhxe", "maphanh", "ht"),
                 new FieldConfig("madongco", "Động cơ", FieldKind.Combo, true, false, "SELECT madongco, madongco + ' - ' + tendongco AS ht FROM tbldongco", "madongco", "ht"),
-                new FieldConfig("manuocsx", "Nước SX", FieldKind.Combo, true, false, "SELECT manuocsx, manuocsx + ' - ' + tennuocsx AS ht FROM tblnuocsx", "manuocsx", "ht"),
+                new FieldConfig("manuocsx", "Nước sản xuất", FieldKind.Combo, true, false, "SELECT manuocsx, manuocsx + ' - ' + tennuocsx AS ht FROM tblnuocsx", "manuocsx", "ht"),
                 new FieldConfig("matt", "Tình trạng", FieldKind.Combo, true, false, "SELECT matt, matt + ' - ' + tentt AS ht FROM tbltinhtrang", "matt", "ht"),
                 new FieldConfig("dungtichbinhxang", "Dung tích bình xăng", FieldKind.Number, true, false),
                 new FieldConfig("anh", "Đường dẫn ảnh", FieldKind.Text, false, false),
-                new FieldConfig("thoigianbaohanh", "Bảo hành", FieldKind.Number, true, false),
+                new FieldConfig("thoigianbaohanh", "Thời gian bảo hành", FieldKind.Number, true, false),
                 new FieldConfig("soluong", "Số lượng", FieldKind.Number, true, false),
                 new FieldConfig("dongianhap", "Đơn giá nhập", FieldKind.Number, true, false),
                 new FieldConfig("dongiaban", "Đơn giá bán", FieldKind.Number, true, false)
@@ -92,8 +92,8 @@ namespace QLXeMay.ViewModels
 
             OpenTheLoaiCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Thể loại", new DanhMucWindow(TwoField("DANH MỤC THỂ LOẠI", "tbltheloai", "maloai", "Mã loại", "tenloai", "Tên loại"), GoHome)));
             OpenMauSacCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Màu sắc", new DanhMucWindow(TwoField("DANH MỤC MÀU SẮC", "tblmausac", "mamau", "Mã màu", "tenmau", "Tên màu"), GoHome)));
-            OpenHangSXCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Hãng sản xuất", new DanhMucWindow(TwoField("DANH MỤC HÃNG SẢN XUẤT", "tblhangsx", "mahangsx", "Mã hãng", "tenhangsx", "Tên hãng"), GoHome)));
-            OpenNuocSXCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Nước sản xuất", new DanhMucWindow(TwoField("DANH MỤC NƯỚC SẢN XUẤT", "tblnuocsx", "manuocsx", "Mã nước", "tennuocsx", "Tên nước"), GoHome)));
+            OpenHangSXCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Hãng sản xuất", new DanhMucWindow(TwoField("DANH MỤC HÃNG SẢN XUẤT", "tblhangsx", "mahangsx", "Mã hãng sản xuất", "tenhangsx", "Tên hãng sản xuất"), GoHome)));
+            OpenNuocSXCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Nước sản xuất", new DanhMucWindow(TwoField("DANH MỤC NƯỚC SẢN XUẤT", "tblnuocsx", "manuocsx", "Mã nước sản xuất", "tennuocsx", "Tên nước sản xuất"), GoHome)));
             OpenPhanhCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Phanh xe", new DanhMucWindow(TwoField("DANH MỤC PHANH XE", "tblphanhxe", "maphanh", "Mã phanh", "tenphanh", "Tên phanh"), GoHome)));
             OpenDongCoCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Động cơ", new DanhMucWindow(TwoField("DANH MỤC ĐỘNG CƠ", "tbldongco", "madongco", "Mã động cơ", "tendongco", "Tên động cơ"), GoHome)));
             OpenTinhTrangCommand = CreateAuthorizedCommand(PermissionNames.ManageProducts, () => Show("Tình trạng", new DanhMucWindow(TwoField("DANH MỤC TÌNH TRẠNG", "tbltinhtrang", "matt", "Mã tình trạng", "tentt", "Tên tình trạng"), GoHome)));

@@ -12,7 +12,8 @@ namespace QLXeMay.Services
     {
         public DataTable Load(DanhMucConfig config)
         {
-            return Function.GetDataToTable("SELECT * FROM " + TableSql(config));
+            string columns = string.Join(", ", config.Fields.Select(ColumnSql));
+            return Function.GetDataToTable("SELECT " + columns + " FROM " + TableSql(config));
         }
 
         public bool Exists(DanhMucConfig config, string keyValue)

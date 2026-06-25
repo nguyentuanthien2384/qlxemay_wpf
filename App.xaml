@@ -150,8 +150,8 @@
         <!-- ============ INPUTS ============ -->
         <Style TargetType="TextBox">
             <Setter Property="Margin" Value="4"/>
-            <Setter Property="MinWidth" Value="150"/>
-            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="170"/>
+            <Setter Property="Height" Value="38"/>
             <Setter Property="Padding" Value="10,0"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="{StaticResource Ink}"/>
@@ -159,6 +159,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource BorderStrong}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
@@ -213,11 +214,12 @@
 
         <Style TargetType="ComboBox">
             <Setter Property="Margin" Value="4"/>
-            <Setter Property="MinWidth" Value="150"/>
-            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="170"/>
+            <Setter Property="Height" Value="38"/>
             <Setter Property="Padding" Value="8,0"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Background" Value="{StaticResource Card}"/>
             <Setter Property="Foreground" Value="{StaticResource Ink}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderStrong}"/>
@@ -226,9 +228,11 @@
 
         <Style TargetType="DatePicker">
             <Setter Property="Margin" Value="4"/>
-            <Setter Property="MinWidth" Value="150"/>
-            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="170"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="SelectedDateFormat" Value="Short"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Background" Value="{StaticResource Card}"/>
             <Setter Property="Foreground" Value="{StaticResource Ink}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderStrong}"/>
@@ -263,6 +267,10 @@
             <Setter Property="SelectionMode" Value="Single"/>
             <Setter Property="SelectionUnit" Value="FullRow"/>
             <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="CanUserSortColumns" Value="True"/>
             <Setter Property="Background" Value="{StaticResource Card}"/>
             <Setter Property="RowBackground" Value="{StaticResource Card}"/>
             <Setter Property="AlternatingRowBackground" Value="{StaticResource CardAlt}"/>
@@ -271,7 +279,8 @@
             <Setter Property="GridLinesVisibility" Value="Horizontal"/>
             <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource Border}"/>
             <Setter Property="RowHeight" Value="34"/>
-            <Setter Property="ColumnHeaderHeight" Value="38"/>
+            <Setter Property="ColumnHeaderHeight" Value="40"/>
+            <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="{StaticResource Ink}"/>
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
@@ -280,8 +289,8 @@
             <Setter Property="Background" Value="#EEF2F8"/>
             <Setter Property="Foreground" Value="#334155"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="10,0"/>
-            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Height" Value="40"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="BorderBrush" Value="{StaticResource Border}"/>

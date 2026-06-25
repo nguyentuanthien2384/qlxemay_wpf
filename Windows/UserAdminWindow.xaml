@@ -5,49 +5,55 @@
         Background="{StaticResource Surface}">
     <UserControl.Resources>
         <Style x:Key="CommandButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="MinWidth" Value="92"/>
-            <Setter Property="Padding" Value="10,0"/>
-            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="112"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style x:Key="PrimaryButton" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentButton}">
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="MinWidth" Value="92"/>
-            <Setter Property="Padding" Value="10,0"/>
-            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="112"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
         <Style x:Key="Input" TargetType="{x:Type TextBox}">
-            <Setter Property="Height" Value="32"/>
+            <Setter Property="Height" Value="38"/>
             <Setter Property="Padding" Value="10,0"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0"/>
         </Style>
         <Style x:Key="PasswordInput" TargetType="{x:Type PasswordBox}">
-            <Setter Property="Height" Value="32"/>
+            <Setter Property="Height" Value="38"/>
             <Setter Property="Padding" Value="10,0"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+        <Style x:Key="FormLabel" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
         </Style>
     </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="176"/>
+            <ColumnDefinition Width="196"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0" Background="{StaticResource Card}" BorderBrush="{StaticResource Border}" BorderThickness="0,0,1,0">
-            <DockPanel Margin="12">
+            <DockPanel Margin="14">
                 <StackPanel DockPanel.Dock="Top">
-                    <Border Width="70" Height="70" CornerRadius="35" Background="#FFFFFF" BorderBrush="#333333" BorderThickness="1" HorizontalAlignment="Center">
-                        <TextBlock Text="🏍" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Border Width="72" Height="72" CornerRadius="18" Background="{StaticResource AccentSoft}" BorderBrush="{StaticResource Border}" BorderThickness="1" HorizontalAlignment="Center">
+                        <TextBlock Text="🛡" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="Chợ mua xe máy" FontStyle="Italic" FontWeight="Bold" TextAlignment="Center" Margin="0,10,0,0"/>
-                    <TextBlock Text="Admin Console" TextAlignment="Center" Foreground="{StaticResource Muted}" FontSize="12"/>
+                    <TextBlock Text="MOTO MANAGER" FontWeight="Bold" TextAlignment="Center" Margin="0,12,0,0"/>
+                    <TextBlock Text="Quản trị hệ thống" TextAlignment="Center" Foreground="{StaticResource Muted}" FontSize="12"/>
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Bottom">
-                    <Button Content="Làm mới" Command="{Binding RefreshCommand}" Style="{StaticResource CommandButton}" Margin="0,0,0,8"/>
+                    <Button Content="Làm mới dữ liệu" Command="{Binding RefreshCommand}" Style="{StaticResource CommandButton}" Margin="0,0,0,8"/>
                     <Button Content="Đóng" Command="{Binding CloseCommand}" Style="{StaticResource CommandButton}" Margin="0"/>
                 </StackPanel>
             </DockPanel>
@@ -62,47 +68,49 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="Danh sách tài khoản" FontSize="24" FontWeight="Bold" Foreground="{StaticResource Ink}" HorizontalAlignment="Center"/>
+            <Border Grid.Row="0" Style="{StaticResource CardBorder}" Padding="12">
+                <TextBlock Text="QUẢN TRỊ TÀI KHOẢN" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Ink}" HorizontalAlignment="Center"/>
+            </Border>
 
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="340"/>
+                    <ColumnDefinition Width="380"/>
                     <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Style="{StaticResource CardBorder}" Padding="16">
+                <Border Grid.Column="0" Style="{StaticResource CardBorder}" Padding="18">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <TextBlock Text="Thông tin tài khoản" FontSize="18" FontWeight="Bold"/>
-                            <TextBlock Text="Tạo mới, cập nhật quyền, reset mật khẩu hoặc mở khóa tài khoản." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,4,0,16"/>
+                            <TextBlock Text="Tạo mới, cập nhật vai trò, đặt lại mật khẩu hoặc mở khóa tài khoản." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,4,0,16"/>
 
-                            <TextBlock Text="Tên đăng nhập" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                            <TextBlock Text="Tên đăng nhập" Style="{StaticResource FormLabel}"/>
                             <TextBox Text="{Binding NewUserName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Input}"/>
 
-                            <TextBlock Text="Tên hiển thị" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                            <TextBlock Text="Tên hiển thị" Style="{StaticResource FormLabel}" Margin="0,12,0,6"/>
                             <TextBox Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Input}"/>
 
-                            <TextBlock Text="Vai trò" FontWeight="SemiBold" Margin="0,10,0,4"/>
-                            <ComboBox ItemsSource="{Binding Roles}" SelectedItem="{Binding SelectedRole, Mode=TwoWay}" DisplayMemberPath="DisplayName" Height="32"/>
+                            <TextBlock Text="Vai trò" Style="{StaticResource FormLabel}" Margin="0,12,0,6"/>
+                            <ComboBox ItemsSource="{Binding Roles}" SelectedItem="{Binding SelectedRole, Mode=TwoWay}" DisplayMemberPath="DisplayName" Height="38" Margin="0"/>
 
-                            <TextBlock Text="Mật khẩu / Mật khẩu tạm" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                            <TextBlock Text="Mật khẩu / mật khẩu tạm" Style="{StaticResource FormLabel}" Margin="0,12,0,6"/>
                             <PasswordBox x:Name="PasswordInput" PasswordChanged="PasswordInput_PasswordChanged" Style="{StaticResource PasswordInput}"/>
 
-                            <CheckBox Content="Tài khoản hoạt động" IsChecked="{Binding IsActive, Mode=TwoWay}" Margin="0,12,0,0"/>
+                            <CheckBox Content="Cho phép tài khoản hoạt động" IsChecked="{Binding IsActive, Mode=TwoWay}" Margin="0,12,0,0"/>
 
-                            <Border Style="{StaticResource CardBorder}" Padding="10" Margin="0,14,0,0">
-                                <TextBlock Text="Mật khẩu tối thiểu 10 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt. Reset mật khẩu sẽ buộc người dùng đổi mật khẩu ở lần đăng nhập tiếp theo." TextWrapping="Wrap" Foreground="{StaticResource Muted}"/>
+                            <Border Style="{StaticResource CardBorder}" Padding="10" Margin="0,14,0,0" Background="{StaticResource CardAlt}">
+                                <TextBlock Text="Mật khẩu tối thiểu 10 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt. Khi đặt lại mật khẩu, người dùng sẽ phải đổi mật khẩu ở lần đăng nhập tiếp theo." TextWrapping="Wrap" Foreground="{StaticResource Muted}"/>
                             </Border>
 
                             <TextBlock Text="{Binding SelectedUserSummary}" TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,14,0,0" Foreground="{StaticResource AccentPressed}"/>
 
                             <WrapPanel Margin="0,16,0,0">
-                                <Button Content="Thêm" Command="{Binding CreateUserCommand}" Style="{StaticResource PrimaryButton}" Margin="0,0,6,8"/>
-                                <Button Content="Sửa" Command="{Binding UpdateUserCommand}" Style="{StaticResource CommandButton}" Margin="0,0,6,8"/>
-                                <Button Content="Reset" Command="{Binding ResetPasswordCommand}" Style="{StaticResource CommandButton}" Margin="0,0,6,8"/>
-                                <Button Content="Mở khóa" Command="{Binding UnlockUserCommand}" Style="{StaticResource CommandButton}" Margin="0,0,6,8"/>
-                                <Button Content="Xóa form" Command="{Binding ClearCommand}" Style="{StaticResource CommandButton}" Margin="0,0,6,8"/>
+                                <Button Content="Thêm tài khoản" Command="{Binding CreateUserCommand}" Style="{StaticResource PrimaryButton}" MinWidth="130"/>
+                                <Button Content="Cập nhật" Command="{Binding UpdateUserCommand}" Style="{StaticResource CommandButton}"/>
+                                <Button Content="Đặt lại mật khẩu" Command="{Binding ResetPasswordCommand}" Style="{StaticResource CommandButton}" MinWidth="138"/>
+                                <Button Content="Mở khóa" Command="{Binding UnlockUserCommand}" Style="{StaticResource CommandButton}"/>
+                                <Button Content="Làm mới form" Command="{Binding ClearCommand}" Style="{StaticResource CommandButton}" MinWidth="126"/>
                             </WrapPanel>
                         </StackPanel>
                     </ScrollViewer>
@@ -114,17 +122,16 @@
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
                               IsReadOnly="True"
-                              HeadersVisibility="Column"
-                              GridLinesVisibility="All">
+                              HeadersVisibility="Column">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Tài khoản" Binding="{Binding UserName}" Width="110"/>
-                            <DataGridTextColumn Header="Tên hiển thị" Binding="{Binding DisplayName}" Width="160"/>
+                            <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding UserName}" Width="130"/>
+                            <DataGridTextColumn Header="Tên hiển thị" Binding="{Binding DisplayName}" Width="170"/>
                             <DataGridTextColumn Header="Vai trò" Binding="{Binding RoleDisplayName}" Width="150"/>
                             <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusText}" Width="120"/>
-                            <DataGridTextColumn Header="Bảo mật" Binding="{Binding SecurityNote}" Width="170"/>
-                            <DataGridTextColumn Header="Sai" Binding="{Binding FailedLoginCount}" Width="50"/>
-                            <DataGridTextColumn Header="Lần đăng nhập cuối" Binding="{Binding LastLoginAt}" Width="150"/>
-                            <DataGridTextColumn Header="Đổi mật khẩu" Binding="{Binding PasswordChangedAt}" Width="150"/>
+                            <DataGridTextColumn Header="Ghi chú bảo mật" Binding="{Binding SecurityNote}" Width="180"/>
+                            <DataGridTextColumn Header="Số lần sai" Binding="{Binding FailedLoginCount}" Width="95"/>
+                            <DataGridTextColumn Header="Đăng nhập gần nhất" Binding="{Binding LastLoginAt}" Width="160"/>
+                            <DataGridTextColumn Header="Đổi mật khẩu gần nhất" Binding="{Binding PasswordChangedAt}" Width="170"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>

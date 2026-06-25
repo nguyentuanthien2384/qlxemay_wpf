@@ -132,7 +132,7 @@
             <!-- Revenue chart -->
             <Border Style="{StaticResource CardBorder}" Padding="22" Margin="0,16,0,22">
                 <StackPanel>
-                    <DockPanel>
+                    <DockPanel LastChildFill="False">
                         <TextBlock DockPanel.Dock="Left" Text="Doanh thu 6 tháng gần nhất" FontSize="15" FontWeight="Bold"/>
                         <TextBlock DockPanel.Dock="Right" Text="{Binding ProfitText, StringFormat='Lợi nhuận ước tính: {0}'}" Foreground="{StaticResource Success}" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </DockPanel>
@@ -221,8 +221,8 @@
                         <Button Content="Nhà cung cấp" Command="{Binding OpenNhaCungCapCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageSuppliers, Converter={StaticResource BoolToVis}}"/>
                         <Button Content="Thể loại" Command="{Binding OpenTheLoaiCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
                         <Button Content="Màu sắc" Command="{Binding OpenMauSacCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
-                        <Button Content="Hãng SX" Command="{Binding OpenHangSXCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
-                        <Button Content="Nước SX" Command="{Binding OpenNuocSXCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Hãng sản xuất" Command="{Binding OpenHangSXCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
+                        <Button Content="Nước sản xuất" Command="{Binding OpenNuocSXCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
                         <Button Content="Phanh xe" Command="{Binding OpenPhanhCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
                         <Button Content="Động cơ" Command="{Binding OpenDongCoCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>
                         <Button Content="Tình trạng" Command="{Binding OpenTinhTrangCommand}" Style="{StaticResource ChipButton}" Visibility="{Binding CanManageProducts, Converter={StaticResource BoolToVis}}"/>

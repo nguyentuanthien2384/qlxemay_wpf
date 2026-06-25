@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using QLXeMay.Infrastructure;
 using QLXeMay.Class;
 using QLXeMay.Models;
 using QLXeMay.Services;
@@ -35,37 +36,36 @@ namespace QLXeMay.Windows
             controls.Clear();
             if (mode == SearchMode.Hang)
             {
-                AddText("tenhang", "Tên hàng");
+                AddText("tenhang", "Tên xe");
                 AddCombo("maloai", "Thể loại", "SELECT maloai, maloai + ' - ' + tenloai AS ht FROM tbltheloai", "maloai", "ht");
-                AddCombo("mahangsx", "Hãng SX", "SELECT mahangsx, mahangsx + ' - ' + tenhangsx AS ht FROM tblhangsx", "mahangsx", "ht");
+                AddCombo("mahangsx", "Hãng sản xuất", "SELECT mahangsx, mahangsx + ' - ' + tenhangsx AS ht FROM tblhangsx", "mahangsx", "ht");
                 AddCombo("matt", "Tình trạng", "SELECT matt, matt + ' - ' + tentt AS ht FROM tbltinhtrang", "matt", "ht");
             }
             else if (mode == SearchMode.KhachHang)
             {
-                AddText("makhach", "Mã khách");
-                AddText("tenkhach", "Tên khách");
+                AddText("makhach", "Mã khách hàng");
+                AddText("tenkhach", "Tên khách hàng");
                 AddText("diachi", "Địa chỉ");
-                AddText("sdt", "Điện thoại");
+                AddText("sdt", "Số điện thoại");
             }
             else if (mode == SearchMode.HoaDonNhap)
             {
-                AddCombo("sohdn", "Mã hóa đơn", "SELECT sohdn, sohdn FROM tblhoadonnhap", "sohdn", "sohdn");
-                AddCombo("mancc", "Nhà cung cấp", "SELECT mancc, mancc FROM tblnhacungcap", "mancc", "mancc");
-                AddCombo("manv", "Nhân viên", "SELECT manv, manv FROM tblnhanvien", "manv", "manv");
+                AddCombo("sohdn", "Mã hóa đơn nhập", "SELECT sohdn, sohdn FROM tblhoadonnhap", "sohdn", "sohdn");
+                AddCombo("mancc", "Nhà cung cấp", "SELECT mancc, mancc + ' - ' + tenncc AS ht FROM tblnhacungcap", "mancc", "ht");
+                AddCombo("manv", "Nhân viên", "SELECT manv, manv + ' - ' + tennv AS ht FROM tblnhanvien", "manv", "ht");
             }
             else
             {
-                AddCombo("soddh", "Mã hóa đơn", "SELECT soddh, soddh FROM tbldondathang", "soddh", "soddh");
-                AddCombo("makhach", "Khách hàng", "SELECT makhach, makhach FROM tblkhachhang", "makhach", "makhach");
-                AddCombo("manv", "Nhân viên", "SELECT manv, manv FROM tblnhanvien", "manv", "manv");
+                AddCombo("soddh", "Mã đơn bán", "SELECT soddh, soddh FROM tbldondathang", "soddh", "soddh");
+                AddCombo("makhach", "Khách hàng", "SELECT makhach, makhach + ' - ' + tenkhach AS ht FROM tblkhachhang", "makhach", "ht");
+                AddCombo("manv", "Nhân viên", "SELECT manv, manv + ' - ' + tennv AS ht FROM tblnhanvien", "manv", "ht");
             }
         }
 
         private void AddText(string name, string label)
         {
-            StackPanel panel = new StackPanel { Width = 205, Margin = new Thickness(4) };
-            panel.Children.Add(new Label { Content = label });
-            TextBox textBox = new TextBox();
+            StackPanel panel = CreateCriteriaField(label);
+            TextBox textBox = new TextBox { Margin = new Thickness(0), Height = 38 };
             panel.Children.Add(textBox);
             CriteriaPanel.Children.Add(panel);
             controls[name] = textBox;
@@ -73,13 +73,30 @@ namespace QLXeMay.Windows
 
         private void AddCombo(string name, string label, string sql, string value, string display)
         {
-            StackPanel panel = new StackPanel { Width = 205, Margin = new Thickness(4) };
-            panel.Children.Add(new Label { Content = label });
-            ComboBox comboBox = new ComboBox();
+            StackPanel panel = CreateCriteriaField(label);
+            ComboBox comboBox = new ComboBox { Margin = new Thickness(0), Height = 38 };
             panel.Children.Add(comboBox);
             CriteriaPanel.Children.Add(panel);
             controls[name] = comboBox;
             Function.FillCombo(sql, comboBox, value, display);
+        }
+
+        private static StackPanel CreateCriteriaField(string label)
+        {
+            StackPanel panel = new StackPanel { Width = 235, Margin = new Thickness(6, 0, 6, 8) };
+            panel.Children.Add(new Label
+            {
+                Content = label,
+                FontWeight = FontWeights.SemiBold,
+                Padding = new Thickness(0),
+                Margin = new Thickness(0, 0, 0, 6)
+            });
+            return panel;
+        }
+
+        private void ResultGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            GridHeaderFormatter.Apply(sender, e);
         }
 
         private IReadOnlyDictionary<string, string> ReadCriteria()

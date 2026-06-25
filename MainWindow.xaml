@@ -91,7 +91,7 @@
 
                 <StackPanel DockPanel.Dock="Bottom">
                     <Border Height="1" Background="{StaticResource Border}" Margin="0,0,0,8"/>
-                    <Button Content="🛡   Quản trị TK" Command="{Binding OpenUserAdminCommand}" Style="{StaticResource SideNavButton}" Visibility="{Binding CanUserAdmin, Converter={StaticResource BoolToVis}}"/>
+                    <Button Content="🛡   Quản trị tài khoản" Command="{Binding OpenUserAdminCommand}" Style="{StaticResource SideNavButton}" Visibility="{Binding CanUserAdmin, Converter={StaticResource BoolToVis}}"/>
                     <Button Content="📜   Nhật ký" Command="{Binding OpenAuditLogCommand}" Style="{StaticResource SideNavButton}" Visibility="{Binding CanAuditLog, Converter={StaticResource BoolToVis}}"/>
                     <Button Content="↪   Đăng xuất" Command="{Binding LogoutCommand}" Style="{StaticResource SideNavButton}"/>
                     <Button Content="✕   Thoát" Command="{Binding ExitCommand}" Style="{StaticResource SideNavButton}"/>
