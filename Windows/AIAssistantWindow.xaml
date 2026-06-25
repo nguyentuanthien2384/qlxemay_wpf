@@ -1,39 +1,145 @@
 <UserControl x:Class="QLXeMay.Windows.AIAssistantWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="{StaticResource Surface}" FontFamily="Segoe UI">
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource Surface}"
+             FontFamily="Segoe UI">
     <UserControl.Resources>
-        <Style x:Key="Cmd" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="MinWidth" Value="120"/>
+        <Style x:Key="AiCmd" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="MinWidth" Value="150"/>
             <Setter Property="Margin" Value="4"/>
+            <Setter Property="Padding" Value="12,7"/>
+        </Style>
+        <Style x:Key="AiPrimaryCmd" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentButton}">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Padding" Value="12,7"/>
+        </Style>
+        <Style x:Key="SampleQuestionButton" TargetType="{x:Type Button}" BasedOn="{StaticResource GhostButton}">
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontWeight" Value="Normal"/>
         </Style>
     </UserControl.Resources>
-    <DockPanel Margin="18">
-        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="10" Margin="0,0,0,12">
-            <TextBlock Text="TRỢ LÝ AI QUẢN LÝ XE MÁY" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Ink}" HorizontalAlignment="Center"/>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Style="{StaticResource CardBorder}" Padding="18" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="TRỢ LÝ AI PHÂN TÍCH KINH DOANH" FontSize="24" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
+                    <TextBlock Text="Dự báo doanh thu, cảnh báo tồn kho, tư vấn nhập hàng và gợi ý chăm sóc khách hàng dựa trên dữ liệu SQL Server của cửa hàng." Foreground="{StaticResource Muted}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+                <Border Grid.Column="1" Background="{StaticResource SuccessSoft}" BorderBrush="{StaticResource Success}" BorderThickness="1" CornerRadius="18" Padding="12,7" VerticalAlignment="Center" Margin="16,0,0,0">
+                    <TextBlock Text="● Offline AI - Không cần API key" Foreground="{StaticResource Success}" FontWeight="SemiBold"/>
+                </Border>
+            </Grid>
         </Border>
-        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,12">
-            <StackPanel>
-                <WrapPanel HorizontalAlignment="Center">
-                    <Button Content="Phân tích tồn kho" Command="{Binding AnalyzeInventoryCommand}" Style="{StaticResource Cmd}"/>
-                    <Button Content="Phân tích doanh thu" Command="{Binding AnalyzeRevenueCommand}" Style="{StaticResource Cmd}"/>
-                    <Button Content="Phân tích khách hàng" Command="{Binding AnalyzeCustomersCommand}" Style="{StaticResource Cmd}"/>
-                    <Button Content="Phân tích nhân viên" Command="{Binding AnalyzeEmployeesCommand}" Style="{StaticResource Cmd}"/>
-                </WrapPanel>
-                <DockPanel Margin="0,10,0,0">
-                    <Label DockPanel.Dock="Left" Content="Câu hỏi / từ khóa:"/>
-                    <WrapPanel DockPanel.Dock="Right">
-                        <Button Content="Tư vấn SP" Command="{Binding AdviseProductCommand}" Style="{StaticResource AccentButton}" MinWidth="120"/>
-                        <Button Content="Tìm thông minh" Command="{Binding SmartSearchCommand}" Style="{StaticResource Cmd}"/>
-                        <Button Content="Hỏi AI" Command="{Binding AskCommand}" Style="{StaticResource Cmd}"/>
+
+        <Grid Grid.Row="1" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.35*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource CardBorder}" Padding="14">
+                <StackPanel>
+                    <TextBlock Text="Phân tích nhanh" FontSize="16" FontWeight="Bold" Margin="4,0,0,8"/>
+                    <WrapPanel>
+                        <Button Content="Tổng quan điều hành" Command="{Binding ExecutiveSummaryCommand}" Style="{StaticResource AiPrimaryCmd}"/>
+                        <Button Content="Dự báo 30 ngày" Command="{Binding ForecastRevenueCommand}" Style="{StaticResource AiCmd}"/>
+                        <Button Content="Gợi ý nhập hàng" Command="{Binding ReorderAdviceCommand}" Style="{StaticResource AiCmd}"/>
+                        <Button Content="Cảnh báo rủi ro" Command="{Binding RiskWarningCommand}" Style="{StaticResource AiCmd}"/>
+                        <Button Content="Tồn kho" Command="{Binding AnalyzeInventoryCommand}" Style="{StaticResource AiCmd}"/>
+                        <Button Content="Doanh thu" Command="{Binding AnalyzeRevenueCommand}" Style="{StaticResource AiCmd}"/>
+                        <Button Content="Khách hàng" Command="{Binding AnalyzeCustomersCommand}" Style="{StaticResource AiCmd}"/>
+                        <Button Content="Nhân viên" Command="{Binding AnalyzeEmployeesCommand}" Style="{StaticResource AiCmd}"/>
                     </WrapPanel>
-                    <TextBox Text="{Binding Question, UpdateSourceTrigger=PropertyChanged}" MinWidth="360"/>
+
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Câu hỏi AI" FontWeight="SemiBold" VerticalAlignment="Center" Margin="4,0,8,0"/>
+                        <TextBox Grid.Column="1" Text="{Binding Question, UpdateSourceTrigger=PropertyChanged}" Height="40" MinWidth="300" ToolTip="Ví dụ: Gợi ý xe dưới 40 triệu cho sinh viên"/>
+                        <WrapPanel Grid.Column="2" VerticalAlignment="Center" Margin="8,0,0,0">
+                            <Button Content="Hỏi AI" Command="{Binding AskCommand}" Style="{StaticResource AiPrimaryCmd}"/>
+                            <Button Content="Tư vấn xe" Command="{Binding AdviseProductCommand}" Style="{StaticResource AiCmd}"/>
+                            <Button Content="Tìm kiếm" Command="{Binding SmartSearchCommand}" Style="{StaticResource AiCmd}"/>
+                            <Button Content="Làm mới" Command="{Binding ClearCommand}" Style="{StaticResource AiCmd}"/>
+                        </WrapPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="14">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top">
+                        <TextBlock Text="Câu hỏi mẫu để demo chức năng" FontSize="16" FontWeight="Bold"/>
+                        <TextBlock Text="Bấm một mẫu để AI tự chạy phân tích." Foreground="{StaticResource Muted}" Margin="0,4,0,10"/>
+                    </StackPanel>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="190">
+                        <ItemsControl ItemsSource="{Binding SampleQuestions}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding}"
+                                            Command="{Binding DataContext.UseSampleQuestionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource SampleQuestionButton}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </DockPanel>
-            </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" Style="{StaticResource CardBorder}" Padding="14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                    <Button DockPanel.Dock="Right" Content="Xem kịch bản mẫu" Command="{Binding SampleScenariosCommand}" Style="{StaticResource AiCmd}"/>
+                    <StackPanel>
+                        <TextBlock Text="Kết quả phân tích" FontSize="16" FontWeight="Bold"/>
+                        <TextBlock Text="Kết quả được trình bày theo dạng báo cáo: KPI, nhận định, rủi ro và hành động đề xuất." Foreground="{StaticResource Muted}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </DockPanel>
+                <TextBox Grid.Row="1"
+                         Text="{Binding Result, Mode=OneWay}"
+                         Style="{x:Null}"
+                         FontFamily="Consolas"
+                         FontSize="14"
+                         Foreground="{StaticResource Ink}"
+                         Background="{StaticResource CardAlt}"
+                         BorderBrush="{StaticResource Border}"
+                         BorderThickness="1"
+                         Padding="14"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Auto"
+                         IsReadOnly="True"/>
+            </Grid>
         </Border>
-        <Border Style="{StaticResource CardBorder}" Padding="10">
-            <TextBox Text="{Binding Result, Mode=OneWay}" FontFamily="Consolas" FontSize="14" TextWrapping="Wrap" AcceptsReturn="True"
-                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsReadOnly="True"/>
-        </Border>
-    </DockPanel>
+    </Grid>
 </UserControl>
