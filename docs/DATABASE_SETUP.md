@@ -3,7 +3,6 @@
 ## File chính
 
 - `CreateDatabase_Complete.sql`: tạo/migrate database `btl`, tạo toàn bộ bảng nghiệp vụ, bảng bảo mật, phân quyền, tài khoản mặc định, dữ liệu mẫu, index, view báo cáo và stored procedure health check.
-- `SampleData_Professional.sql`: bổ sung dữ liệu mẫu chuyên nghiệp cho Trợ lý AI, bao gồm nhiều xe máy, khách hàng, hóa đơn nhập và đơn bán theo nhiều tháng.
 
 ## Cách chạy bằng SQL Server Management Studio
 
@@ -12,7 +11,6 @@
 3. Mở file `CreateDatabase_Complete.sql`.
 4. Bấm `Execute`.
 5. Sau khi chạy xong, kiểm tra dòng cuối hiển thị: `QLXeMay database complete: tạo/migrate database btl thành công.`
-6. Mở tiếp file `SampleData_Professional.sql` và bấm `Execute` nếu muốn có dữ liệu phong phú để demo Trợ lý AI.
 
 ## Cách chạy bằng sqlcmd
 
@@ -21,6 +19,17 @@ sqlcmd -S .\SQLEXPRESS -E -i ".\CreateDatabase_Complete.sql"
 ```
 
 Nếu dùng SQL Server instance khác, đổi `.\SQLEXPRESS` thành server name của bạn, ví dụ `localhost` hoặc `DESKTOP-ABC\SQLEXPRESS`.
+
+
+## Dữ liệu mẫu chuyên nghiệp cho Trợ lý AI
+
+Sau khi chạy file chính, nên chạy thêm:
+
+```powershell
+sqlcmd -S .\SQLEXPRESS -E -i ".\SampleData_Professional.sql"
+```
+
+File `SampleData_Professional.sql` bổ sung nhiều khách hàng, xe máy, hóa đơn nhập và đơn bán theo nhiều tháng để Trợ lý AI có thể dự báo doanh thu, cảnh báo rủi ro, gợi ý nhập hàng và tư vấn sản phẩm chuyên nghiệp hơn.
 
 ## Connection string khuyến nghị cho app
 
