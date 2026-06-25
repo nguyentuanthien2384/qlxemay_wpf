@@ -34,6 +34,7 @@ Khi ứng dụng khởi động, app cũng tự đảm bảo các bảng bảo m
 - `tblpermissions`
 - `tblrolepermissions`
 - `tblusers`
+- `tblauditlog`
 
 ## 4. Tài Khoản Mặc Định
 
@@ -41,11 +42,11 @@ Khi ứng dụng khởi động, app cũng tự đảm bảo các bảng bảo m
 
 | Tài khoản | Mật khẩu | Vai trò |
 | --- | --- | --- |
-| `admin` | `Admin@123` | Quản trị hệ thống |
-| `manager` | `Manager@123` | Quản lý cửa hàng |
-| `sales` | `Sales@123` | Nhân viên bán hàng |
-| `warehouse` | `Warehouse@123` | Thủ kho |
-| `viewer` | `Viewer@123` | Chỉ xem báo cáo |
+| `admin` | `Admin@12345` | Quản trị hệ thống |
+| `manager` | `Manager@12345` | Quản lý cửa hàng |
+| `sales` | `Sales@12345` | Nhân viên bán hàng |
+| `warehouse` | `Warehouse@12345` | Thủ kho |
+| `viewer` | `Viewer@12345` | Chỉ xem báo cáo |
 
 Quyền chính:
 
@@ -100,3 +101,64 @@ Trong Visual Studio:
 ## 7. Ghi Chú Kỹ Thuật
 
 Phân quyền được kiểm tra ở `MainWindowViewModel` trước khi mở từng chức năng. Các nút/menu không có quyền sẽ bị disable. Mật khẩu chỉ được kiểm tra qua hash trong `AuthenticationService`, không so sánh chuỗi rõ trong database.
+
+## 8. Nâng Cấp Giao Diện Và Bảo Mật Trong Bản Này
+
+Bản này đã được phát triển lại theo phong cách trong folder `giao_dien`: sidebar hồng bên trái, vùng làm việc xanh, tiêu đề form rõ ràng, bảng dữ liệu lớn ở giữa và nhóm nút thao tác ở cuối hoặc cạnh form.
+
+Các nâng cấp chính:
+
+- Màn hình đăng nhập mới có nút đăng ký, hiện/ẩn mật khẩu, cảnh báo Caps Lock và thông báo lỗi chi tiết.
+- Có màn hình đăng ký tài khoản. Tài khoản tự đăng ký mặc định chưa active và cần admin kích hoạt trong màn hình quản trị tài khoản.
+- Chính sách mật khẩu mới: tối thiểu 10 ký tự, có chữ hoa, chữ thường, chữ số và ký tự đặc biệt.
+- Sai mật khẩu 5 lần sẽ bị khóa 15 phút.
+- Admin có thể tạo tài khoản, cập nhật vai trò, bật/tắt active, reset mật khẩu tạm và mở khóa tài khoản.
+- Reset mật khẩu sẽ đặt `mustchangepassword=1`; người dùng phải đổi mật khẩu ngay sau lần đăng nhập tiếp theo.
+- Có bảng `tblauditlog` để ghi các sự kiện bảo mật quan trọng: đăng nhập, đăng nhập sai, lockout, đăng ký, reset mật khẩu, đổi mật khẩu, mở khóa.
+- Có timeout phiên làm việc mặc định 20 phút. Có thể cấu hình bằng biến môi trường:
+
+```powershell
+$env:QLXEMAY_IDLE_TIMEOUT_MINUTES="20"
+```
+
+Tài khoản mặc định mới trên database cài mới:
+
+| Tài khoản | Mật khẩu | Vai trò |
+| --- | --- | --- |
+| `admin` | `Admin@12345` | Quản trị hệ thống |
+| `manager` | `Manager@12345` | Quản lý cửa hàng |
+| `sales` | `Sales@12345` | Nhân viên bán hàng |
+| `warehouse` | `Warehouse@12345` | Thủ kho |
+| `viewer` | `Viewer@12345` | Chỉ xem báo cáo |
+
+Nếu database đã từng được seed bằng mật khẩu cũ, app không tự ghi đè mật khẩu hiện có. Khi đó dùng tài khoản/mật khẩu cũ đang có trong DB hoặc reset trong SQL/admin.
+
+## 9. Kiểm Tra Bản Hoàn Thiện
+
+Bản hoàn thiện có thêm màn hình `Nhật ký hệ thống` dành cho tài khoản `admin`. Mở từ sidebar hoặc vùng `Danh mục nhanh` trong màn hình chính.
+
+Để kiểm tra toàn bộ source trên Windows, chạy:
+
+```powershell
+.\tools\verify-source.ps1
+```
+
+Script này sẽ thực hiện:
+
+1. In thông tin .NET SDK.
+2. Restore NuGet.
+3. Build solution ở cấu hình Release.
+4. Chạy project test console.
+5. Publish bản win-x64 self-contained vào `publish\win-x64`.
+
+Kế hoạch test bàn giao nằm tại:
+
+```text
+docs/TEST_PLAN.md
+```
+
+Publish profile mẫu nằm tại:
+
+```text
+Properties/PublishProfiles/FolderProfile.pubxml
+```

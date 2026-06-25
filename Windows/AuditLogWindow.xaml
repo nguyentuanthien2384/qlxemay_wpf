@@ -14,28 +14,32 @@
             <TextBlock Text="NHẬT KÝ HỆ THỐNG" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Ink}" HorizontalAlignment="Center"/>
         </Border>
 
-        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,12">
+        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="14" Margin="0,0,0,12">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="170"/>
+                    <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="170"/>
+                    <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Từ ngày"/>
-                <DatePicker Grid.Column="1" SelectedDate="{Binding FromDate}"/>
-                <Label Grid.Column="2" Content="Đến ngày"/>
-                <DatePicker Grid.Column="3" SelectedDate="{Binding ToDate}"/>
-                <Label Grid.Column="4" Content="Từ khóa"/>
-                <TextBox Grid.Column="5" Text="{Binding Keyword, UpdateSourceTrigger=PropertyChanged}"/>
-                <Label Grid.Column="6" Content="Số dòng"/>
-                <TextBox Grid.Column="7" Text="{Binding MaxRows, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Grid.Column="8" Content="Tải" Command="{Binding SearchCommand}" Style="{StaticResource AccentButton}" MinWidth="90"/>
+                <Label Grid.Column="0" Content="Từ ngày" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                <DatePicker Grid.Column="1" SelectedDate="{Binding FromDate}" Margin="0"/>
+                <Label Grid.Column="3" Content="Đến ngày" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                <DatePicker Grid.Column="4" SelectedDate="{Binding ToDate}" Margin="0"/>
+                <Label Grid.Column="6" Content="Từ khóa" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                <TextBox Grid.Column="7" Text="{Binding Keyword, UpdateSourceTrigger=PropertyChanged}" Margin="0"/>
+                <Label Grid.Column="9" Content="Số dòng" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                <TextBox Grid.Column="10" Text="{Binding MaxRows, UpdateSourceTrigger=PropertyChanged}" Margin="0" MinWidth="90"/>
+                <Button Grid.Column="12" Content="Tải dữ liệu" Command="{Binding SearchCommand}" Style="{StaticResource AccentButton}" MinWidth="105" Height="36" Margin="0"/>
             </Grid>
         </Border>
 
@@ -44,8 +48,8 @@
                 <TextBlock DockPanel.Dock="Left" Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="{StaticResource Ink}"/>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Hôm nay" Command="{Binding TodayCommand}" Style="{StaticResource Cmd}"/>
-                    <Button Content="7 ngày" Command="{Binding Last7DaysCommand}" Style="{StaticResource Cmd}"/>
-                    <Button Content="Xóa lọc" Command="{Binding ClearFilterCommand}" Style="{StaticResource Cmd}"/>
+                    <Button Content="7 ngày gần nhất" Command="{Binding Last7DaysCommand}" Style="{StaticResource Cmd}"/>
+                    <Button Content="Xóa bộ lọc" Command="{Binding ClearFilterCommand}" Style="{StaticResource Cmd}"/>
                     <Button Content="Đóng" Command="{Binding CloseCommand}" Style="{StaticResource Cmd}"/>
                 </StackPanel>
             </DockPanel>
