@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using QLXeMay.Class;
 using QLXeMay.Infrastructure;
 using QLXeMay.Models;
@@ -10,6 +11,8 @@ namespace QLXeMay.Services
     internal sealed class DashboardService : IDashboardService
     {
         private const double MaxBarHeight = 150.0;
+        private const int LowStockThreshold = 5;
+        private static readonly CultureInfo ViCulture = CultureInfo.GetCultureInfo("vi-VN");
 
         public DashboardSnapshot Load()
         {
@@ -22,6 +25,9 @@ namespace QLXeMay.Services
             snapshot.CustomerCount = (int)Scalar("SELECT COUNT(*) FROM tblkhachhang");
             snapshot.ProductCount = (int)Scalar("SELECT COUNT(*) FROM tbldmhang");
             snapshot.MonthlyRevenue = LoadMonthlyRevenue();
+            snapshot.FeaturedProducts = LoadFeaturedProducts();
+            snapshot.TopSellingProducts = LoadTopSellingProducts();
+            snapshot.LowStockProducts = LoadLowStockProducts();
 
             return snapshot;
         }
@@ -94,6 +100,116 @@ namespace QLXeMay.Services
             }
 
             return bars;
+        }
+
+        private static IReadOnlyList<ProductShowcaseItem> LoadFeaturedProducts()
+        {
+            List<ProductShowcaseItem> list = new List<ProductShowcaseItem>();
+            try
+            {
+                DataTable table = Function.GetDataToTable(
+                    @"SELECT mahang, tenhang, ISNULL(dongiaban,0) AS dongiaban, ISNULL(soluong,0) AS soluong
+                      FROM tbldmhang
+                      ORDER BY ISNULL(dongiaban,0) DESC, tenhang");
+
+                foreach (DataRow row in table.Rows)
+                {
+                    int stock = Function.ToInt(row["soluong"].ToString());
+                    list.Add(new ProductShowcaseItem
+                    {
+                        ProductId = row["mahang"].ToString().Trim(),
+                        ProductName = row["tenhang"].ToString().Trim(),
+                        PriceText = FormatCurrency(Function.ToDouble(row["dongiaban"].ToString())),
+                        StockText = "Tồn kho: " + stock.ToString("#,##0"),
+                        Subtitle = "Giá bán cao - tiềm năng lợi nhuận tốt",
+                        Stock = stock,
+                        IsLowStock = stock <= LowStockThreshold
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Dashboard featured products query failed.", ex);
+            }
+
+            return list;
+        }
+
+        private static IReadOnlyList<ProductShowcaseItem> LoadTopSellingProducts()
+        {
+            List<ProductShowcaseItem> list = new List<ProductShowcaseItem>();
+            try
+            {
+                DataTable table = Function.GetDataToTable(
+                    @"SELECT TOP 6 h.mahang, h.tenhang, ISNULL(h.dongiaban,0) AS dongiaban, ISNULL(h.soluong,0) AS tonkho, SUM(ISNULL(ct.soluong,0)) AS luotban
+                      FROM tblchitietddh ct
+                      INNER JOIN tbldmhang h ON h.mahang=ct.mahang
+                      GROUP BY h.mahang, h.tenhang, h.dongiaban, h.soluong
+                      ORDER BY SUM(ISNULL(ct.soluong,0)) DESC, h.tenhang");
+
+                foreach (DataRow row in table.Rows)
+                {
+                    int sold = Function.ToInt(row["luotban"].ToString());
+                    int stock = Function.ToInt(row["tonkho"].ToString());
+                    list.Add(new ProductShowcaseItem
+                    {
+                        ProductId = row["mahang"].ToString().Trim(),
+                        ProductName = row["tenhang"].ToString().Trim(),
+                        PriceText = FormatCurrency(Function.ToDouble(row["dongiaban"].ToString())),
+                        StockText = "Đã bán: " + sold.ToString("#,##0") + " xe",
+                        Subtitle = "Tồn hiện tại: " + stock.ToString("#,##0"),
+                        SoldQuantity = sold,
+                        Stock = stock,
+                        IsLowStock = stock <= LowStockThreshold
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Dashboard top-selling products query failed.", ex);
+            }
+
+            return list;
+        }
+
+        private static IReadOnlyList<ProductShowcaseItem> LoadLowStockProducts()
+        {
+            List<ProductShowcaseItem> list = new List<ProductShowcaseItem>();
+            try
+            {
+                DataTable table = Function.GetDataToTable(
+                    @"SELECT TOP 6 mahang, tenhang, ISNULL(dongiaban,0) AS dongiaban, ISNULL(soluong,0) AS soluong
+                      FROM tbldmhang
+                      WHERE ISNULL(soluong,0) <= @threshold
+                      ORDER BY ISNULL(soluong,0) ASC, tenhang",
+                    Function.Param("@threshold", LowStockThreshold));
+
+                foreach (DataRow row in table.Rows)
+                {
+                    int stock = Function.ToInt(row["soluong"].ToString());
+                    list.Add(new ProductShowcaseItem
+                    {
+                        ProductId = row["mahang"].ToString().Trim(),
+                        ProductName = row["tenhang"].ToString().Trim(),
+                        PriceText = FormatCurrency(Function.ToDouble(row["dongiaban"].ToString())),
+                        StockText = "Tồn kho còn: " + stock.ToString("#,##0"),
+                        Subtitle = "Cần nhập thêm để tránh thiếu hàng",
+                        Stock = stock,
+                        IsLowStock = true
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("Dashboard low-stock products query failed.", ex);
+            }
+
+            return list;
+        }
+
+        private static string FormatCurrency(double value)
+        {
+            return value.ToString("N0", ViCulture) + " VNĐ";
         }
     }
 }
