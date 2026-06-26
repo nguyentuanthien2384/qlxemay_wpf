@@ -10,7 +10,12 @@ namespace QLXeMay.Models
         public string Category { get; set; }
         public string Brand { get; set; }
         public string Color { get; set; }
+        public string Brake { get; set; }
+        public string Engine { get; set; }
+        public string OriginCountry { get; set; }
+        public string Condition { get; set; }
         public int Year { get; set; }
+        public double FuelTankCapacity { get; set; }
         public int WarrantyMonths { get; set; }
         public double UnitPrice { get; set; }
         public int Stock { get; set; }
@@ -31,6 +36,17 @@ namespace QLXeMay.Models
                 return string.Join("  •  ", parts);
             }
         }
+
+        public string CategoryText => string.IsNullOrWhiteSpace(Category) ? "Chưa cập nhật" : Category.Trim();
+        public string BrandText => string.IsNullOrWhiteSpace(Brand) ? "Chưa cập nhật" : Brand.Trim();
+        public string ColorText => string.IsNullOrWhiteSpace(Color) ? "Chưa cập nhật" : Color.Trim();
+        public string BrakeText => string.IsNullOrWhiteSpace(Brake) ? "Chưa cập nhật" : Brake.Trim();
+        public string EngineText => string.IsNullOrWhiteSpace(Engine) ? "Chưa cập nhật" : Engine.Trim();
+        public string OriginCountryText => string.IsNullOrWhiteSpace(OriginCountry) ? "Chưa cập nhật" : OriginCountry.Trim();
+        public string ConditionText => string.IsNullOrWhiteSpace(Condition) ? "Chưa cập nhật" : Condition.Trim();
+        public string FuelTankText => FuelTankCapacity > 0 ? FuelTankCapacity.ToString("0.#") + " lít" : "Chưa cập nhật";
+        public string WarrantyText => WarrantyMonths > 0 ? WarrantyMonths + " tháng" : "Chưa cập nhật";
+        public string YearText => Year > 0 ? Year.ToString() : "Chưa cập nhật";
     }
 
     /// <summary>A single product+quantity line submitted when placing a self-service order.</summary>

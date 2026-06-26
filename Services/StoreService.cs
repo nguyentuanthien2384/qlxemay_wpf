@@ -18,12 +18,16 @@ namespace QLXeMay.Services
         public IReadOnlyList<StoreProduct> LoadProducts(string keyword)
         {
             string sql = @"
-SELECT h.mahang, h.tenhang, h.namsx, h.thoigianbaohanh, h.soluong, h.dongiaban, h.anh,
-       l.tenloai, s.tenhangsx, m.tenmau
+SELECT h.mahang, h.tenhang, h.namsx, h.thoigianbaohanh, h.soluong, h.dongiaban, h.anh, h.dungtichbinhxang,
+       l.tenloai, s.tenhangsx, m.tenmau, p.tenphanh, d.tendongco, n.tennuocsx, t.tentt
 FROM tbldmhang h
 LEFT JOIN tbltheloai l ON h.maloai = l.maloai
 LEFT JOIN tblhangsx s ON h.mahangsx = s.mahangsx
-LEFT JOIN tblmausac m ON h.mamau = m.mamau";
+LEFT JOIN tblmausac m ON h.mamau = m.mamau
+LEFT JOIN tblphanhxe p ON h.maphanh = p.maphanh
+LEFT JOIN tbldongco d ON h.madongco = d.madongco
+LEFT JOIN tblnuocsx n ON h.manuocsx = n.manuocsx
+LEFT JOIN tbltinhtrang t ON h.matt = t.matt";
 
             DataTable table;
             if (string.IsNullOrWhiteSpace(keyword))
@@ -33,7 +37,7 @@ LEFT JOIN tblmausac m ON h.mamau = m.mamau";
             }
             else
             {
-                sql += " WHERE h.tenhang LIKE @kw OR s.tenhangsx LIKE @kw OR l.tenloai LIKE @kw ORDER BY h.tenhang";
+                sql += " WHERE h.tenhang LIKE @kw OR s.tenhangsx LIKE @kw OR l.tenloai LIKE @kw OR d.tendongco LIKE @kw OR p.tenphanh LIKE @kw ORDER BY h.tenhang";
                 table = Function.GetDataToTable(sql, Function.Param("@kw", "%" + keyword.Trim() + "%"));
             }
 
@@ -47,7 +51,12 @@ LEFT JOIN tblmausac m ON h.mamau = m.mamau";
                     Category = AsString(row["tenloai"]),
                     Brand = AsString(row["tenhangsx"]),
                     Color = AsString(row["tenmau"]),
+                    Brake = AsString(row["tenphanh"]),
+                    Engine = AsString(row["tendongco"]),
+                    OriginCountry = AsString(row["tennuocsx"]),
+                    Condition = AsString(row["tentt"]),
                     Year = Function.ToInt(row["namsx"].ToString()),
+                    FuelTankCapacity = Function.ToDouble(row["dungtichbinhxang"].ToString()),
                     WarrantyMonths = Function.ToInt(row["thoigianbaohanh"].ToString()),
                     UnitPrice = Function.ToDouble(row["dongiaban"].ToString()),
                     Stock = Function.ToInt(row["soluong"].ToString()),

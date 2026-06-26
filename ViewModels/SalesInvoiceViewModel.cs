@@ -14,6 +14,7 @@ namespace QLXeMay.ViewModels
         private readonly IExcelExportService excelExportService;
         private readonly IDialogService dialogService;
         private readonly Action closeAction;
+        private readonly string initialProductId;
         private readonly RelayCommand exportCommand;
         private string invoiceNo;
         private DateTime? invoiceDate = DateTime.Today;
@@ -41,12 +42,14 @@ namespace QLXeMay.ViewModels
             ISalesInvoiceService invoiceService,
             IExcelExportService excelExportService,
             IDialogService dialogService,
-            Action closeAction)
+            Action closeAction,
+            string initialProductId = null)
         {
             this.invoiceService = invoiceService;
             this.excelExportService = excelExportService;
             this.dialogService = dialogService;
             this.closeAction = closeAction;
+            this.initialProductId = initialProductId;
 
             NewInvoiceCommand = new RelayCommand(_ => NewInvoice());
             SaveLineCommand = new RelayCommand(_ => SaveLine());
@@ -60,6 +63,7 @@ namespace QLXeMay.ViewModels
 
             RefreshLookups();
             NewInvoice();
+            ApplyInitialProduct();
         }
 
         public DataView Employees { get; private set; }
@@ -87,8 +91,9 @@ namespace QLXeMay.ViewModels
             get => selectedCustomerId;
             set
             {
-                if (!SetProperty(ref selectedCustomerId, value)) return;
-                PartyInfo info = invoiceService.GetCustomerInfo(value);
+                string code = NormalizeCustomerCode(value);
+                if (!SetProperty(ref selectedCustomerId, code)) return;
+                PartyInfo info = invoiceService.GetCustomerInfo(code);
                 CustomerName = info.Name;
                 CustomerAddress = info.Address;
                 CustomerPhone = info.Phone;
@@ -262,6 +267,13 @@ namespace QLXeMay.ViewModels
             return true;
         }
 
+        private static string NormalizeCustomerCode(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return value;
+            int idx = value.IndexOf(" - ", StringComparison.Ordinal);
+            return (idx > 0 ? value.Substring(0, idx) : value).Trim();
+        }
+
         private void ClearDetailInputs()
         {
             SelectedProductId = null;
@@ -289,6 +301,22 @@ namespace QLXeMay.ViewModels
             OnPropertyChanged(nameof(Customers));
             OnPropertyChanged(nameof(Products));
             OnPropertyChanged(nameof(InvoiceNumbers));
+        }
+
+        private void ApplyInitialProduct()
+        {
+            if (string.IsNullOrWhiteSpace(initialProductId) || Products == null) return;
+            string productCode = initialProductId.Trim();
+            for (int i = 0; i < Products.Count; i++)
+            {
+                object value = Products[i]["mahang"];
+                if (value != null && string.Equals(value.ToString().Trim(), productCode, StringComparison.OrdinalIgnoreCase))
+                {
+                    SelectedProductId = productCode;
+                    if (string.IsNullOrWhiteSpace(Quantity)) Quantity = "1";
+                    return;
+                }
+            }
         }
     }
 }

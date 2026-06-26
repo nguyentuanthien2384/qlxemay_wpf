@@ -1,7 +1,10 @@
 using System;
+using System.Globalization;
 using System.Data;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
 using QLXeMay.Class;
+using QLXeMay.Domain;
 using QLXeMay.Infrastructure;
 using QLXeMay.Models;
 using QLXeMay.Services;
@@ -10,6 +13,7 @@ namespace QLXeMay.ViewModels
 {
     internal sealed class PurchaseInvoiceViewModel : ViewModelBase
     {
+        private static readonly CultureInfo ViCulture = CultureInfo.GetCultureInfo("vi-VN");
         private readonly IPurchaseInvoiceService invoiceService;
         private readonly IExcelExportService excelExportService;
         private readonly IDialogService dialogService;
@@ -109,9 +113,35 @@ namespace QLXeMay.ViewModels
         }
 
         public string ProductName { get => productName; private set => SetProperty(ref productName, value); }
-        public string Quantity { get => quantity; set => SetProperty(ref quantity, value); }
-        public string UnitPrice { get => unitPrice; set => SetProperty(ref unitPrice, value); }
-        public string Discount { get => discount; set => SetProperty(ref discount, value); }
+        public string Quantity
+        {
+            get => quantity;
+            set
+            {
+                if (SetProperty(ref quantity, value))
+                    RecalculateLineTotalPreview();
+            }
+        }
+
+        public string UnitPrice
+        {
+            get => unitPrice;
+            set
+            {
+                if (SetProperty(ref unitPrice, value))
+                    RecalculateLineTotalPreview();
+            }
+        }
+
+        public string Discount
+        {
+            get => discount;
+            set
+            {
+                if (SetProperty(ref discount, value))
+                    RecalculateLineTotalPreview();
+            }
+        }
         public string LineTotal { get => lineTotal; private set => SetProperty(ref lineTotal, value); }
         public string Total { get => total; private set => SetProperty(ref total, value); }
         public string AmountInWords { get => amountInWords; private set => SetProperty(ref amountInWords, value); }
@@ -128,6 +158,14 @@ namespace QLXeMay.ViewModels
         public ICommand DeleteLineCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand CloseCommand { get; }
+
+        public void FormatUnitPriceForDisplay()
+        {
+            if (!TryParseFlexibleNumber(UnitPrice, out double parsedUnitPrice))
+                return;
+
+            UnitPrice = parsedUnitPrice.ToString("N0", ViCulture);
+        }
 
         private void NewInvoice()
         {
@@ -255,12 +293,22 @@ namespace QLXeMay.ViewModels
             if (string.IsNullOrWhiteSpace(SelectedEmployeeId)) { dialogService.ShowWarning("Chọn mã nhân viên."); return false; }
             if (string.IsNullOrWhiteSpace(SelectedSupplierId)) { dialogService.ShowWarning("Chọn mã nhà cung cấp."); return false; }
             if (string.IsNullOrWhiteSpace(SelectedProductId)) { dialogService.ShowWarning("Chọn mã hàng."); return false; }
-            if (!Function.IsSoNguyen(Quantity) || Function.ToInt(Quantity) <= 0) { dialogService.ShowWarning("Số lượng phải là số nguyên dương."); return false; }
-            if (!Function.IsSoThuc(UnitPrice) || Function.ToDouble(UnitPrice) <= 0) { dialogService.ShowWarning("Đơn giá phải là số dương."); return false; }
-            if (!Function.IsSoThuc(Discount)) Discount = "0";
-            parsedQuantity = Function.ToInt(Quantity);
-            parsedUnitPrice = Function.ToDouble(UnitPrice);
-            parsedDiscount = Function.ToDouble(Discount);
+            if (!int.TryParse((Quantity ?? string.Empty).Trim(), out parsedQuantity) || parsedQuantity <= 0)
+            {
+                dialogService.ShowWarning("Số lượng phải là số nguyên dương.");
+                return false;
+            }
+
+            if (!TryParseFlexibleNumber(UnitPrice, out parsedUnitPrice) || parsedUnitPrice <= 0)
+            {
+                dialogService.ShowWarning("Đơn giá phải là số dương.");
+                return false;
+            }
+
+            if (!TryParseFlexibleNumber(Discount, out parsedDiscount))
+                parsedDiscount = 0;
+
+            parsedDiscount = Math.Max(0, Math.Min(100, parsedDiscount));
             return true;
         }
 
@@ -272,6 +320,51 @@ namespace QLXeMay.ViewModels
             UnitPrice = "";
             Discount = "0";
             LineTotal = "0";
+        }
+
+        private void RecalculateLineTotalPreview()
+        {
+            if (!int.TryParse((Quantity ?? string.Empty).Trim(), out int parsedQuantity) || parsedQuantity <= 0)
+            {
+                LineTotal = "0";
+                return;
+            }
+
+            if (!TryParseFlexibleNumber(UnitPrice, out double parsedUnitPrice) || parsedUnitPrice <= 0)
+            {
+                LineTotal = "0";
+                return;
+            }
+
+            if (!TryParseFlexibleNumber(Discount, out double parsedDiscount))
+                parsedDiscount = 0;
+
+            double line = InvoiceCalculator.CalculateLineTotal(parsedQuantity, parsedUnitPrice, parsedDiscount);
+            LineTotal = line.ToString("N0", ViCulture);
+        }
+
+        private static bool TryParseFlexibleNumber(string input, out double value)
+        {
+            value = 0;
+            if (string.IsNullOrWhiteSpace(input)) return false;
+
+            string cleaned = input.Trim().ToLowerInvariant();
+            cleaned = cleaned.Replace("vnđ", "").Replace("vnd", "").Replace("%", "").Replace(" ", "");
+
+            if (Regex.IsMatch(cleaned, @"^\d{1,3}(\.\d{3})+(,\d+)?$"))
+            {
+                cleaned = cleaned.Replace(".", "").Replace(",", ".");
+            }
+            else if (Regex.IsMatch(cleaned, @"^\d{1,3}(,\d{3})+(\.\d+)?$"))
+            {
+                cleaned = cleaned.Replace(",", "");
+            }
+            else
+            {
+                cleaned = cleaned.Replace(",", ".");
+            }
+
+            return double.TryParse(cleaned, NumberStyles.Any, CultureInfo.InvariantCulture, out value);
         }
 
         private void ApplyTotal(double totalValue)

@@ -18,6 +18,7 @@ namespace QLXeMay.ViewModels
         private int maxRows = 300;
         private string statusMessage;
         private AuditLogEntry selectedEntry;
+        private string selectedEntryDetail = "Chọn một dòng trong bảng để xem chi tiết.";
 
         public AuditLogWindowViewModel(IAuditLogService auditLogService, IDialogService dialogService, Action closeAction)
         {
@@ -68,7 +69,17 @@ namespace QLXeMay.ViewModels
         public AuditLogEntry SelectedEntry
         {
             get => selectedEntry;
-            set => SetProperty(ref selectedEntry, value);
+            set
+            {
+                if (!SetProperty(ref selectedEntry, value)) return;
+                SelectedEntryDetail = selectedEntry?.Detail ?? "Chọn một dòng trong bảng để xem chi tiết.";
+            }
+        }
+
+        public string SelectedEntryDetail
+        {
+            get => selectedEntryDetail;
+            private set => SetProperty(ref selectedEntryDetail, value);
         }
 
         public ICommand SearchCommand { get; }
@@ -81,13 +92,39 @@ namespace QLXeMay.ViewModels
         {
             try
             {
+                StatusMessage = "Đang tải dữ liệu nhật ký...";
+                if (FromDate.HasValue && ToDate.HasValue && FromDate.Value.Date > ToDate.Value.Date)
+                {
+                    dialogService.ShowWarning("Khoảng ngày không hợp lệ: 'Từ ngày' phải nhỏ hơn hoặc bằng 'Đến ngày'.");
+                    return;
+                }
+
+                if (MaxRows <= 0) MaxRows = 300;
+                string normalizedKeyword = string.IsNullOrWhiteSpace(Keyword) ? string.Empty : Keyword.Trim();
+                if (!string.Equals(Keyword, normalizedKeyword, StringComparison.Ordinal))
+                {
+                    Keyword = normalizedKeyword;
+                }
+
+                var loadedEntries = auditLogService.Load(FromDate, ToDate, normalizedKeyword, MaxRows);
                 Entries.Clear();
-                foreach (AuditLogEntry entry in auditLogService.Load(FromDate, ToDate, Keyword, MaxRows))
+                foreach (AuditLogEntry entry in loadedEntries)
                 {
                     Entries.Add(entry);
                 }
 
-                StatusMessage = "Đã tải " + Entries.Count + " dòng nhật ký.";
+                SelectedEntry = Entries.Count > 0 ? Entries[0] : null;
+                if (Entries.Count == 0)
+                {
+                    StatusMessage = "Không có dữ liệu phù hợp. Hãy nới khoảng ngày hoặc xóa từ khóa để thử lại.";
+                }
+                else
+                {
+                    string periodText = (FromDate.HasValue || ToDate.HasValue)
+                        ? " trong khoảng lọc đã chọn"
+                        : string.Empty;
+                    StatusMessage = "Đã tải " + Entries.Count + " dòng nhật ký" + periodText + ".";
+                }
             }
             catch (Exception ex)
             {

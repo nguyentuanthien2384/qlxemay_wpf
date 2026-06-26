@@ -14,6 +14,116 @@ USE btl;
 GO
 
 -- =============================================================
+-- 0. ĐẢM BẢO MASTER DATA TỒN TẠI (CHO DB CŨ THIẾU MÃ)
+-- =============================================================
+MERGE dbo.tbltheloai AS target
+USING (VALUES
+    ('TL01', N'Underbone'), ('TL02', N'Scooter'), ('TL03', N'Sportbike'),
+    ('TL04', N'Nakedbike'), ('TL05', N'Cruiser'), ('TL06', N'Xe điện')
+) AS source(maloai, tenloai)
+ON target.maloai = source.maloai
+WHEN MATCHED THEN UPDATE SET tenloai = source.tenloai
+WHEN NOT MATCHED THEN INSERT(maloai, tenloai) VALUES(source.maloai, source.tenloai);
+GO
+
+MERGE dbo.tblmausac AS target
+USING (VALUES
+    ('MS01', N'Đen'), ('MS02', N'Trắng'), ('MS03', N'Đỏ'), ('MS04', N'Xanh'),
+    ('MS05', N'Bạc'), ('MS06', N'Xám'), ('MS07', N'Vàng'), ('MS08', N'Nâu')
+) AS source(mamau, tenmau)
+ON target.mamau = source.mamau
+WHEN MATCHED THEN UPDATE SET tenmau = source.tenmau
+WHEN NOT MATCHED THEN INSERT(mamau, tenmau) VALUES(source.mamau, source.tenmau);
+GO
+
+MERGE dbo.tblhangsx AS target
+USING (VALUES
+    ('HSX01', N'Honda'), ('HSX02', N'Yamaha'), ('HSX03', N'Suzuki'),
+    ('HSX04', N'VinFast'), ('HSX05', N'Piaggio'), ('HSX06', N'SYM'), ('HSX07', N'Kawasaki')
+) AS source(mahangsx, tenhangsx)
+ON target.mahangsx = source.mahangsx
+WHEN MATCHED THEN UPDATE SET tenhangsx = source.tenhangsx
+WHEN NOT MATCHED THEN INSERT(mahangsx, tenhangsx) VALUES(source.mahangsx, source.tenhangsx);
+GO
+
+MERGE dbo.tbldongco AS target
+USING (VALUES
+    ('DC01', N'4 thì'), ('DC02', N'Phun xăng điện tử'), ('DC03', N'Động cơ điện'),
+    ('DC04', N'Blue Core'), ('DC05', N'eSP+'), ('DC06', N'DOHC')
+) AS source(madongco, tendongco)
+ON target.madongco = source.madongco
+WHEN MATCHED THEN UPDATE SET tendongco = source.tendongco
+WHEN NOT MATCHED THEN INSERT(madongco, tendongco) VALUES(source.madongco, source.tendongco);
+GO
+
+MERGE dbo.tblnuocsx AS target
+USING (VALUES
+    ('NSX01', N'Việt Nam'), ('NSX02', N'Nhật Bản'), ('NSX03', N'Ý'),
+    ('NSX04', N'Trung Quốc'), ('NSX05', N'Thái Lan'), ('NSX06', N'Indonesia')
+) AS source(manuocsx, tennuocsx)
+ON target.manuocsx = source.manuocsx
+WHEN MATCHED THEN UPDATE SET tennuocsx = source.tennuocsx
+WHEN NOT MATCHED THEN INSERT(manuocsx, tennuocsx) VALUES(source.manuocsx, source.tennuocsx);
+GO
+
+MERGE dbo.tblphanhxe AS target
+USING (VALUES
+    ('PH01', N'Phanh đĩa'), ('PH02', N'Phanh tang trống'), ('PH03', N'Phanh ABS'), ('PH04', N'CBS')
+) AS source(maphanh, tenphanh)
+ON target.maphanh = source.maphanh
+WHEN MATCHED THEN UPDATE SET tenphanh = source.tenphanh
+WHEN NOT MATCHED THEN INSERT(maphanh, tenphanh) VALUES(source.maphanh, source.tenphanh);
+GO
+
+MERGE dbo.tbltinhtrang AS target
+USING (VALUES
+    ('TT01', N'Mới'), ('TT02', N'Đã qua sử dụng'), ('TT03', N'Đang bảo hành'), ('TT04', N'Tạm ngưng bán')
+) AS source(matt, tentt)
+ON target.matt = source.matt
+WHEN MATCHED THEN UPDATE SET tentt = source.tentt
+WHEN NOT MATCHED THEN INSERT(matt, tentt) VALUES(source.matt, source.tentt);
+GO
+
+MERGE dbo.tblcongviec AS target
+USING (VALUES
+    ('CV01', N'Quản lý', 15000000),
+    ('CV02', N'Nhân viên bán hàng', 8000000),
+    ('CV03', N'Kế toán', 10000000),
+    ('CV04', N'Thủ kho', 7000000),
+    ('CV05', N'Kỹ thuật viên', 9000000)
+) AS source(macv, tencv, luongthang)
+ON target.macv = source.macv
+WHEN MATCHED THEN UPDATE SET tencv = source.tencv, luongthang = source.luongthang
+WHEN NOT MATCHED THEN INSERT(macv, tencv, luongthang) VALUES(source.macv, source.tencv, source.luongthang);
+GO
+
+MERGE dbo.tblnhanvien AS target
+USING (VALUES
+    ('NV01', N'Nguyễn Văn An', N'Nam', CONVERT(date,'1995-05-15'), '0912345678', N'Hà Nội', 'CV01'),
+    ('NV02', N'Trần Thị Bình', N'Nữ', CONVERT(date,'1998-08-20'), '0987654321', N'Hà Nội', 'CV02'),
+    ('NV03', N'Lê Minh Khôi', N'Nam', CONVERT(date,'1997-02-10'), '0901122334', N'Bắc Ninh', 'CV04'),
+    ('NV04', N'Phạm Thu Hà', N'Nữ', CONVERT(date,'1996-11-03'), '0933445566', N'Hà Nội', 'CV03'),
+    ('NV05', N'Đỗ Quốc Huy', N'Nam', CONVERT(date,'1999-07-22'), '0977889900', N'Hải Phòng', 'CV05')
+) AS source(manv, tennv, gioitinh, ngaysinh, sdt, diachi, macv)
+ON target.manv = source.manv
+WHEN MATCHED THEN UPDATE SET tennv = source.tennv, gioitinh = source.gioitinh, ngaysinh = source.ngaysinh, sdt = source.sdt, diachi = source.diachi, macv = source.macv
+WHEN NOT MATCHED THEN INSERT(manv, tennv, gioitinh, ngaysinh, sdt, diachi, macv) VALUES(source.manv, source.tennv, source.gioitinh, source.ngaysinh, source.sdt, source.diachi, source.macv);
+GO
+
+MERGE dbo.tblnhacungcap AS target
+USING (VALUES
+    ('NCC01', N'Honda Việt Nam', N'Vĩnh Phúc', '0241234567'),
+    ('NCC02', N'Yamaha Motor Việt Nam', N'Hà Nội', '0249876543'),
+    ('NCC03', N'Suzuki Việt Nam', N'Đồng Nai', '0281111222'),
+    ('NCC04', N'VinFast Trading', N'Hải Phòng', '0225888999'),
+    ('NCC05', N'Piaggio Việt Nam', N'Vĩnh Phúc', '0211999888')
+) AS source(mancc, tenncc, diachi, sdt)
+ON target.mancc = source.mancc
+WHEN MATCHED THEN UPDATE SET tenncc = source.tenncc, diachi = source.diachi, sdt = source.sdt
+WHEN NOT MATCHED THEN INSERT(mancc, tenncc, diachi, sdt) VALUES(source.mancc, source.tenncc, source.diachi, source.sdt);
+GO
+
+-- =============================================================
 -- 1. BỔ SUNG KHÁCH HÀNG MẪU
 -- =============================================================
 MERGE dbo.tblkhachhang AS target
@@ -44,6 +154,14 @@ GO
 -- =============================================================
 MERGE dbo.tbldmhang AS target
 USING (VALUES
+    ('MH01', N'Honda Vision 2024', 'TL02', 'HSX01', 'MS01', 2024, 'PH04', 'DC05', 'NSX01', 'TT01', 5, N'', 24, 8, 29000000, 34000000),
+    ('MH02', N'Yamaha Exciter 155', 'TL01', 'HSX02', 'MS03', 2024, 'PH01', 'DC04', 'NSX01', 'TT01', 4, N'', 24, 5, 44000000, 50500000),
+    ('MH03', N'Honda SH Mode', 'TL02', 'HSX01', 'MS02', 2024, 'PH03', 'DC05', 'NSX01', 'TT01', 7, N'', 36, 3, 57000000, 69000000),
+    ('MH04', N'Yamaha Grande', 'TL02', 'HSX02', 'MS05', 2024, 'PH04', 'DC04', 'NSX01', 'TT01', 4, N'', 24, 4, 39000000, 46000000),
+    ('MH05', N'Suzuki Raider R150', 'TL03', 'HSX03', 'MS04', 2024, 'PH01', 'DC06', 'NSX06', 'TT01', 4, N'', 24, 3, 43000000, 51000000),
+    ('MH06', N'VinFast Feliz S', 'TL06', 'HSX04', 'MS02', 2024, 'PH01', 'DC03', 'NSX01', 'TT01', 0, N'', 36, 6, 24000000, 32000000),
+    ('MH07', N'Piaggio Liberty 125', 'TL02', 'HSX05', 'MS08', 2024, 'PH03', 'DC02', 'NSX01', 'TT01', 6, N'', 24, 3, 50000000, 61000000),
+    ('MH08', N'Honda Winner X', 'TL01', 'HSX01', 'MS06', 2024, 'PH01', 'DC05', 'NSX01', 'TT01', 4, N'', 24, 4, 39000000, 48000000),
     ('MH09', N'Honda Air Blade 160 ABS', 'TL02', 'HSX01', 'MS06', 2024, 'PH03', 'DC05', 'NSX01', 'TT01', 5, N'', 36, 7, 47000000, 56000000),
     ('MH10', N'Honda Lead 125', 'TL02', 'HSX01', 'MS02', 2024, 'PH04', 'DC05', 'NSX01', 'TT01', 6, N'', 36, 6, 34000000, 42000000),
     ('MH11', N'Yamaha Janus 125', 'TL02', 'HSX02', 'MS04', 2024, 'PH04', 'DC04', 'NSX01', 'TT01', 4, N'', 24, 10, 25000000, 31500000),
@@ -184,6 +302,109 @@ UPDATE dbo.tbldmhang SET soluong = CASE mahang
 WHERE mahang IN ('MH01','MH02','MH03','MH04','MH05','MH06','MH07','MH08','MH09','MH10','MH11','MH12','MH13','MH14','MH15','MH16','MH17','MH18','MH19','MH20','MH21','MH22');
 GO
 
+-- =============================================================
+-- 5. TÀI KHOẢN DEMO MỞ RỘNG (ĐĂNG NHẬP ĐƯỢC NGAY)
+-- =============================================================
+IF COL_LENGTH('dbo.tblusers', 'makhach') IS NULL
+    ALTER TABLE dbo.tblusers ADD makhach CHAR(10) NULL;
+GO
+
+MERGE dbo.tblpermissions AS target
+USING (VALUES
+    (N'ShopOrder', N'Mua hàng trực tuyến', N'Khách hàng tự đăng nhập để đặt mua xe')
+) AS source(permissionkey, displayname, description)
+ON target.permissionkey = source.permissionkey
+WHEN MATCHED THEN UPDATE SET displayname = source.displayname, description = source.description
+WHEN NOT MATCHED THEN INSERT(permissionkey, displayname, description) VALUES(source.permissionkey, source.displayname, source.description);
+GO
+
+MERGE dbo.tblroles AS target
+USING (VALUES
+    (N'Customer', N'Khách hàng', N'Tài khoản khách hàng tự đăng nhập và mua sản phẩm', 1)
+) AS source(rolename, displayname, description, isbuiltin)
+ON target.rolename = source.rolename
+WHEN MATCHED THEN UPDATE SET displayname = source.displayname, description = source.description, isbuiltin = source.isbuiltin
+WHEN NOT MATCHED THEN INSERT(rolename, displayname, description, isbuiltin) VALUES(source.rolename, source.displayname, source.description, source.isbuiltin);
+GO
+
+INSERT INTO dbo.tblrolepermissions(roleid, permissionkey)
+SELECT r.roleid, N'ShopOrder'
+FROM dbo.tblroles r
+WHERE r.rolename = N'Customer'
+  AND NOT EXISTS (
+      SELECT 1 FROM dbo.tblrolepermissions x
+      WHERE x.roleid = r.roleid AND x.permissionkey = N'ShopOrder'
+  );
+GO
+
+-- Mật khẩu staff demo: Demo@12345
+-- Hash PBKDF2-SHA256 (160000): 6xjh+9hNU/WONktI4j4Rz4H5SH+52iduZT2PPc1MTAI=
+-- Salt: BXQhZicr8Hr7FmbQNIuq+Q==
+MERGE dbo.tblusers AS target
+USING (VALUES
+    (N'demo_admin', N'Admin Demo', N'6xjh+9hNU/WONktI4j4Rz4H5SH+52iduZT2PPc1MTAI=', N'BXQhZicr8Hr7FmbQNIuq+Q==', 160000, N'Administrator', 1, NULL),
+    (N'demo_manager', N'Quản lý Demo', N'6xjh+9hNU/WONktI4j4Rz4H5SH+52iduZT2PPc1MTAI=', N'BXQhZicr8Hr7FmbQNIuq+Q==', 160000, N'Manager', 1, NULL),
+    (N'demo_sales_1', N'Bán hàng Demo 1', N'6xjh+9hNU/WONktI4j4Rz4H5SH+52iduZT2PPc1MTAI=', N'BXQhZicr8Hr7FmbQNIuq+Q==', 160000, N'Sales', 1, NULL),
+    (N'demo_sales_2', N'Bán hàng Demo 2', N'6xjh+9hNU/WONktI4j4Rz4H5SH+52iduZT2PPc1MTAI=', N'BXQhZicr8Hr7FmbQNIuq+Q==', 160000, N'Sales', 1, NULL),
+    (N'demo_warehouse', N'Thủ kho Demo', N'6xjh+9hNU/WONktI4j4Rz4H5SH+52iduZT2PPc1MTAI=', N'BXQhZicr8Hr7FmbQNIuq+Q==', 160000, N'Warehouse', 1, NULL),
+    (N'demo_viewer', N'Xem báo cáo Demo', N'6xjh+9hNU/WONktI4j4Rz4H5SH+52iduZT2PPc1MTAI=', N'BXQhZicr8Hr7FmbQNIuq+Q==', 160000, N'Viewer', 1, NULL)
+) AS source(username, displayname, passwordhash, passwordsalt, passworditerations, rolename, isactive, makhach)
+ON target.username = source.username
+WHEN MATCHED THEN UPDATE SET
+    displayname = source.displayname,
+    passwordhash = source.passwordhash,
+    passwordsalt = source.passwordsalt,
+    passworditerations = source.passworditerations,
+    roleid = (SELECT roleid FROM dbo.tblroles WHERE rolename = source.rolename),
+    isactive = source.isactive,
+    failedlogincount = 0,
+    lockoutendat = NULL,
+    mustchangepassword = 0,
+    passwordchangedat = GETDATE(),
+    makhach = source.makhach
+WHEN NOT MATCHED THEN
+    INSERT(username, displayname, passwordhash, passwordsalt, passworditerations, roleid, isactive, failedlogincount, lockoutendat, mustchangepassword, passwordchangedat, makhach)
+    VALUES(source.username, source.displayname, source.passwordhash, source.passwordsalt, source.passworditerations,
+           (SELECT roleid FROM dbo.tblroles WHERE rolename = source.rolename),
+           source.isactive, 0, NULL, 0, GETDATE(), source.makhach);
+GO
+
+-- Mật khẩu customer demo: Customer@12345
+-- Hash PBKDF2-SHA256 (160000): WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=
+-- Salt: Kw+zYZr7Q6Bu1SHOneWO6Q==
+MERGE dbo.tblusers AS target
+USING (VALUES
+    (N'customer_01', N'Bùi Ngọc Anh', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH06'),
+    (N'customer_02', N'Nguyễn Hải Nam', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH07'),
+    (N'customer_03', N'Trần Gia Hân', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH08'),
+    (N'customer_04', N'Lê Quốc Bảo', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH09'),
+    (N'customer_05', N'Phạm Minh Châu', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH10'),
+    (N'customer_06', N'Hoàng Tuấn Kiệt', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH11'),
+    (N'customer_07', N'Đặng Thảo Vy', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH12'),
+    (N'customer_08', N'Võ Đức Anh', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH13'),
+    (N'customer_09', N'Mai Phương Linh', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH14'),
+    (N'customer_10', N'Đỗ Thanh Phong', N'WoLOSjviMc1MTpy7fvI6fMbH6/KVs0aFULlLItIum4g=', N'Kw+zYZr7Q6Bu1SHOneWO6Q==', 160000, N'Customer', 1, 'KH15')
+) AS source(username, displayname, passwordhash, passwordsalt, passworditerations, rolename, isactive, makhach)
+ON target.username = source.username
+WHEN MATCHED THEN UPDATE SET
+    displayname = source.displayname,
+    passwordhash = source.passwordhash,
+    passwordsalt = source.passwordsalt,
+    passworditerations = source.passworditerations,
+    roleid = (SELECT roleid FROM dbo.tblroles WHERE rolename = source.rolename),
+    isactive = source.isactive,
+    failedlogincount = 0,
+    lockoutendat = NULL,
+    mustchangepassword = 0,
+    passwordchangedat = GETDATE(),
+    makhach = source.makhach
+WHEN NOT MATCHED THEN
+    INSERT(username, displayname, passwordhash, passwordsalt, passworditerations, roleid, isactive, failedlogincount, lockoutendat, mustchangepassword, passwordchangedat, makhach)
+    VALUES(source.username, source.displayname, source.passwordhash, source.passwordsalt, source.passworditerations,
+           (SELECT roleid FROM dbo.tblroles WHERE rolename = source.rolename),
+           source.isactive, 0, NULL, 0, GETDATE(), source.makhach);
+GO
+
 IF NOT EXISTS (SELECT 1 FROM dbo.tblauditlog WHERE eventtype = N'ProfessionalSampleDataSeeded')
 BEGIN
     INSERT INTO dbo.tblauditlog(eventtype, username, userid, detail)
@@ -191,7 +412,8 @@ BEGIN
 END
 GO
 
-EXEC dbo.sp_QLXeMay_DatabaseHealthCheck;
+IF OBJECT_ID(N'dbo.sp_QLXeMay_DatabaseHealthCheck', N'P') IS NOT NULL
+    EXEC dbo.sp_QLXeMay_DatabaseHealthCheck;
 GO
 
 PRINT N'QLXeMay professional sample data: đã bổ sung dữ liệu mẫu cho Trợ lý AI.';

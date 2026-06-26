@@ -67,9 +67,10 @@ namespace QLXeMay.Class
 
             DataTable customers = Function.GetDataToTable(@"
                 SELECT COUNT(*) AS TongKH,
-                       SUM(CASE WHEN EXISTS (SELECT 1 FROM tbldondathang d WHERE d.makhach = kh.makhach) THEN 1 ELSE 0 END) AS DaMua,
-                       SUM(CASE WHEN NOT EXISTS (SELECT 1 FROM tbldondathang d WHERE d.makhach = kh.makhach) THEN 1 ELSE 0 END) AS ChuaMua
-                FROM tblkhachhang kh");
+                       SUM(CASE WHEN d.makhach IS NOT NULL THEN 1 ELSE 0 END) AS DaMua,
+                       SUM(CASE WHEN d.makhach IS NULL THEN 1 ELSE 0 END) AS ChuaMua
+                FROM tblkhachhang kh
+                LEFT JOIN (SELECT DISTINCT makhach FROM tbldondathang) d ON d.makhach = kh.makhach");
 
             double doanhThu30 = FirstDouble(revenue, "DoanhThu30Ngay");
             double doanhThuTruoc = FirstDouble(revenue, "DoanhThu30NgayTruoc");
@@ -426,10 +427,11 @@ namespace QLXeMay.Class
             }
 
             DataTable stock = Function.GetDataToTable(@"
-                SELECT SUM(CASE WHEN soluong = 0 THEN 1 ELSE 0 END) AS HetHang,
-                       SUM(CASE WHEN soluong BETWEEN 1 AND 3 THEN 1 ELSE 0 END) AS SapHet,
-                       ISNULL(SUM(CASE WHEN soluong > 0 AND NOT EXISTS (SELECT 1 FROM tblchitietddh ct WHERE ct.mahang = tbldmhang.mahang) THEN soluong * dongianhap ELSE 0 END),0) AS VonCham
-                FROM tbldmhang");
+                SELECT SUM(CASE WHEN h.soluong = 0 THEN 1 ELSE 0 END) AS HetHang,
+                       SUM(CASE WHEN h.soluong BETWEEN 1 AND 3 THEN 1 ELSE 0 END) AS SapHet,
+                       ISNULL(SUM(CASE WHEN h.soluong > 0 AND sold.mahang IS NULL THEN h.soluong * h.dongianhap ELSE 0 END),0) AS VonCham
+                FROM tbldmhang h
+                LEFT JOIN (SELECT DISTINCT mahang FROM tblchitietddh) sold ON sold.mahang = h.mahang");
             int het = FirstInt(stock, "HetHang");
             int sapHet = FirstInt(stock, "SapHet");
             double vonCham = FirstDouble(stock, "VonCham");
@@ -641,9 +643,10 @@ namespace QLXeMay.Class
 
             DataTable summary = Function.GetDataToTable(@"
                 SELECT COUNT(*) AS TongKhach,
-                       SUM(CASE WHEN EXISTS (SELECT 1 FROM tbldondathang d WHERE d.makhach = kh.makhach) THEN 1 ELSE 0 END) AS CoMua,
-                       SUM(CASE WHEN NOT EXISTS (SELECT 1 FROM tbldondathang d WHERE d.makhach = kh.makhach) THEN 1 ELSE 0 END) AS ChuaMua
-                FROM tblkhachhang kh");
+                       SUM(CASE WHEN d.makhach IS NOT NULL THEN 1 ELSE 0 END) AS CoMua,
+                       SUM(CASE WHEN d.makhach IS NULL THEN 1 ELSE 0 END) AS ChuaMua
+                FROM tblkhachhang kh
+                LEFT JOIN (SELECT DISTINCT makhach FROM tbldondathang) d ON d.makhach = kh.makhach");
             sb.AppendLine("\nI. Tổng quan tệp khách hàng");
             sb.AppendLine($"   • Tổng khách hàng: {FirstInt(summary, "TongKhach"):N0}");
             sb.AppendLine($"   • Đã mua: {FirstInt(summary, "CoMua"):N0}");

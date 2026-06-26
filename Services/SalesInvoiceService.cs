@@ -10,7 +10,11 @@ namespace QLXeMay.Services
     internal sealed class SalesInvoiceService : ISalesInvoiceService
     {
         public DataTable LoadEmployees() => Function.GetDataToTable("SELECT manv, manv FROM tblnhanvien");
-        public DataTable LoadCustomers() => Function.GetDataToTable("SELECT makhach, makhach FROM tblkhachhang");
+        public DataTable LoadCustomers() => Function.GetDataToTable(@"
+            SELECT makhach,
+                   CONCAT(makhach, ' - ', ISNULL(tenkhach, N'Chưa có tên')) AS CustomerDisplay
+            FROM tblkhachhang
+            ORDER BY makhach");
         public DataTable LoadProducts() => Function.GetDataToTable("SELECT mahang, mahang FROM tbldmhang");
         public DataTable LoadInvoiceNumbers() => Function.GetDataToTable("SELECT soddh, soddh FROM tbldondathang");
 
