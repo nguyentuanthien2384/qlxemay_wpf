@@ -51,7 +51,7 @@ namespace QLXeMay.Windows
             isPasswordVisible = !isPasswordVisible;
             PasswordInput.Visibility = isPasswordVisible ? Visibility.Collapsed : Visibility.Visible;
             VisiblePasswordBox.Visibility = isPasswordVisible ? Visibility.Visible : Visibility.Collapsed;
-            TogglePasswordButton.Content = isPasswordVisible ? "Ẩn" : "Hiện";
+            TogglePasswordButton.Content = isPasswordVisible ? "Ẩn mật khẩu" : "Hiện mật khẩu";
             if (isPasswordVisible)
             {
                 VisiblePasswordBox.Focus();

@@ -22,5 +22,11 @@ namespace QLXeMay.Windows
         {
             GridHeaderFormatter.Apply(sender, e);
         }
+
+        private void UnitPriceTextBox_LostFocus(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (DataContext is PurchaseInvoiceViewModel vm)
+                vm.FormatUnitPriceForDisplay();
+        }
     }
 }

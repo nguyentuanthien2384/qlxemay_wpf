@@ -8,14 +8,15 @@ namespace QLXeMay.Windows
 {
     public partial class HoaDonBanWindow : UserControl
     {
-        public HoaDonBanWindow(Action goBack)
+        public HoaDonBanWindow(Action goBack, string initialProductId = null)
         {
             InitializeComponent();
             DataContext = new SalesInvoiceViewModel(
                 new SalesInvoiceService(),
                 new ExcelExportService(),
                 new DialogService(),
-                goBack ?? (() => { }));
+                goBack ?? (() => { }),
+                initialProductId);
         }
 
         private void DetailsGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)

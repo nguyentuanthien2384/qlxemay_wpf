@@ -10,6 +10,19 @@
         <Style x:Key="FormField" TargetType="StackPanel">
             <Setter Property="Margin" Value="6,4,6,8"/>
         </Style>
+        <Style x:Key="InputTextBox" TargetType="{x:Type TextBox}">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="8,4"/>
+        </Style>
+        <Style x:Key="InputComboBox" TargetType="{x:Type ComboBox}">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="MaxDropDownHeight" Value="220"/>
+        </Style>
+        <Style x:Key="InputDatePicker" TargetType="{x:Type DatePicker}" BasedOn="{StaticResource FormDatePicker}"/>
+        <Style TargetType="{x:Type DatePickerTextBox}" BasedOn="{StaticResource FormDatePickerTextBox}"/>
     </UserControl.Resources>
     <DockPanel Margin="18">
         <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,12">
@@ -43,24 +56,45 @@
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
             <GroupBox Header="Thông tin chung" Grid.Row="0">
                 <UniformGrid Columns="4" Margin="8">
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Mã đơn bán"/><TextBox Text="{Binding InvoiceNo, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Ngày bán"/><DatePicker SelectedDate="{Binding InvoiceDate}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Mã nhân viên"/><ComboBox ItemsSource="{Binding Employees}" SelectedValuePath="manv" DisplayMemberPath="manv" SelectedValue="{Binding SelectedEmployeeId, Mode=TwoWay}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Tên nhân viên"/><TextBox Text="{Binding EmployeeName, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Mã khách hàng"/><ComboBox ItemsSource="{Binding Customers}" SelectedValuePath="makhach" DisplayMemberPath="makhach" SelectedValue="{Binding SelectedCustomerId, Mode=TwoWay}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Tên khách hàng"/><TextBox Text="{Binding CustomerName, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Địa chỉ"/><TextBox Text="{Binding CustomerAddress, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Số điện thoại"/><TextBox Text="{Binding CustomerPhone, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
+                    <StackPanel Style="{StaticResource FormField}"><Label Content="Mã đơn bán"/><TextBox Style="{StaticResource InputTextBox}" Text="{Binding InvoiceNo, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
+                    <StackPanel Style="{StaticResource FormField}"><Label Content="Ngày bán"/><DatePicker Style="{StaticResource InputDatePicker}" SelectedDate="{Binding InvoiceDate}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
+                    <StackPanel Style="{StaticResource FormField}"><Label Content="Mã nhân viên"/><ComboBox Style="{StaticResource InputComboBox}" ItemsSource="{Binding Employees}" SelectedValuePath="manv" DisplayMemberPath="manv" SelectedValue="{Binding SelectedEmployeeId, Mode=TwoWay}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
+                    <StackPanel Style="{StaticResource FormField}"><Label Content="Tên nhân viên"/><TextBox Style="{StaticResource InputTextBox}" Text="{Binding EmployeeName, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
+                    <StackPanel Style="{StaticResource FormField}">
+                        <Label Content="Mã khách hàng"/>
+                        <ComboBox Style="{StaticResource InputComboBox}"
+                                  ItemsSource="{Binding Customers}"
+                                  SelectedValuePath="makhach"
+                                  DisplayMemberPath="CustomerDisplay"
+                                  SelectedValue="{Binding SelectedCustomerId, Mode=TwoWay}"
+                                  IsEditable="True"
+                                  IsTextSearchEnabled="True"
+                                  StaysOpenOnEdit="True"
+                                  IsEnabled="{Binding IsInvoiceActive}"
+                                  ToolTip="Chọn từ danh sách hoặc gõ để tìm nhanh mã khách hàng"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource FormField}"><Label Content="Tên khách hàng"/><TextBox Style="{StaticResource InputTextBox}" Text="{Binding CustomerName, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
+                    <StackPanel Style="{StaticResource FormField}"><Label Content="Địa chỉ"/><TextBox Style="{StaticResource InputTextBox}" Text="{Binding CustomerAddress, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
+                    <StackPanel Style="{StaticResource FormField}"><Label Content="Số điện thoại"/><TextBox Style="{StaticResource InputTextBox}" Text="{Binding CustomerPhone, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
                 </UniformGrid>
             </GroupBox>
             <GroupBox Header="Thông tin xe bán" Grid.Row="1">
-                <UniformGrid Columns="5" Margin="8">
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Mã xe"/><ComboBox ItemsSource="{Binding Products}" SelectedValuePath="mahang" DisplayMemberPath="mahang" SelectedValue="{Binding SelectedProductId, Mode=TwoWay}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Tên xe"/><TextBox Text="{Binding ProductName, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Số lượng"/><TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Giảm giá (%)"/><TextBox Text="{Binding Discount, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
-                    <StackPanel Style="{StaticResource FormField}"><Label Content="Thành tiền"/><TextBox Text="{Binding LineTotal, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
-                </UniformGrid>
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Grid.Column="0" Style="{StaticResource FormField}"><Label Content="Mã xe"/><ComboBox Style="{StaticResource InputComboBox}" ItemsSource="{Binding Products}" SelectedValuePath="mahang" DisplayMemberPath="mahang" SelectedValue="{Binding SelectedProductId, Mode=TwoWay}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Style="{StaticResource FormField}"><Label Content="Tên xe"/><TextBox Style="{StaticResource InputTextBox}" Text="{Binding ProductName, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="2" Style="{StaticResource FormField}"><Label Content="Số lượng"/><TextBox Style="{StaticResource InputTextBox}" Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="0" Style="{StaticResource FormField}"><Label Content="Giảm giá (%)"/><TextBox Style="{StaticResource InputTextBox}" Text="{Binding Discount, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsInvoiceActive}"/></StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="1" Style="{StaticResource FormField}"><Label Content="Thành tiền"/><TextBox Style="{StaticResource InputTextBox}" Text="{Binding LineTotal, Mode=OneWay}" IsReadOnly="True"/></StackPanel>
+                </Grid>
             </GroupBox>
             <Border Grid.Row="2" Style="{StaticResource CardBorder}" Padding="10">
                 <DataGrid ItemsSource="{Binding DetailsView}"

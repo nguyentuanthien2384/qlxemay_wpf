@@ -19,31 +19,25 @@
         </Border>
 
         <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" Padding="14" Margin="0,0,0,12">
-            <Grid HorizontalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="170"/>
-                    <ColumnDefinition Width="18"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="170"/>
-                    <ColumnDefinition Width="18"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="190"/>
-                    <ColumnDefinition Width="22"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Từ ngày" Style="{StaticResource FilterLabel}" Visibility="{Binding DateFilterVisibility}"/>
-                <DatePicker Grid.Column="1" SelectedDate="{Binding DateFrom}" Visibility="{Binding DateFilterVisibility}" Margin="0"/>
-                <Label Grid.Column="3" Content="Đến ngày" Style="{StaticResource FilterLabel}" Visibility="{Binding DateFilterVisibility}"/>
-                <DatePicker Grid.Column="4" SelectedDate="{Binding DateTo}" Visibility="{Binding DateFilterVisibility}" Margin="0"/>
-                <Label Grid.Column="6" Content="Nhóm theo" Style="{StaticResource FilterLabel}" Visibility="{Binding GroupFilterVisibility}"/>
-                <ComboBox Grid.Column="7" ItemsSource="{Binding GroupOptions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedGroup}" Visibility="{Binding GroupFilterVisibility}" Margin="0"/>
-                <Button Grid.Column="9" Content="Hiển thị" Command="{Binding ShowCommand}" Style="{StaticResource AccentButton}" MinWidth="108" Height="36" Margin="0"/>
-                <Button Grid.Column="10" Content="Xuất Excel" Command="{Binding ExportCommand}" Style="{StaticResource Cmd}"/>
-                <Button Grid.Column="11" Content="Đóng" Command="{Binding CloseCommand}" Style="{StaticResource Cmd}"/>
-            </Grid>
+            <WrapPanel Orientation="Horizontal" ItemHeight="40">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,18,0" Visibility="{Binding DateFilterVisibility}">
+                    <Label Content="Từ ngày" Style="{StaticResource FilterLabel}"/>
+                    <DatePicker Style="{StaticResource FormDatePicker}" Width="150" SelectedDate="{Binding DateFrom}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,18,0" Visibility="{Binding DateFilterVisibility}">
+                    <Label Content="Đến ngày" Style="{StaticResource FilterLabel}"/>
+                    <DatePicker Style="{StaticResource FormDatePicker}" Width="150" SelectedDate="{Binding DateTo}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,18,0" Visibility="{Binding GroupFilterVisibility}">
+                    <Label Content="Nhóm theo" Style="{StaticResource FilterLabel}"/>
+                    <ComboBox Width="170" ItemsSource="{Binding GroupOptions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedGroup}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Hiển thị" Command="{Binding ShowCommand}" Style="{StaticResource AccentButton}" MinWidth="108" Height="36" Margin="0"/>
+                    <Button Content="Xuất Excel" Command="{Binding ExportCommand}" Style="{StaticResource Cmd}"/>
+                    <Button Content="Đóng" Command="{Binding CloseCommand}" Style="{StaticResource Cmd}"/>
+                </StackPanel>
+            </WrapPanel>
         </Border>
 
         <Grid>

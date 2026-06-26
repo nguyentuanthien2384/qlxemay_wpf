@@ -24,6 +24,12 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Margin" Value="0"/>
         </Style>
+        <Style x:Key="InputCombo" TargetType="{x:Type ComboBox}">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
         <Style x:Key="PasswordInput" TargetType="{x:Type PasswordBox}">
             <Setter Property="Height" Value="38"/>
             <Setter Property="Padding" Value="10,0"/>
@@ -74,9 +80,9 @@
 
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="380"/>
+                    <ColumnDefinition Width="1.05*" MinWidth="420"/>
                     <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1.45*" MinWidth="580"/>
                 </Grid.ColumnDefinitions>
 
                 <Border Grid.Column="0" Style="{StaticResource CardBorder}" Padding="18">
@@ -92,7 +98,7 @@
                             <TextBox Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Input}"/>
 
                             <TextBlock Text="Vai trò" Style="{StaticResource FormLabel}" Margin="0,12,0,6"/>
-                            <ComboBox ItemsSource="{Binding Roles}" SelectedItem="{Binding SelectedRole, Mode=TwoWay}" DisplayMemberPath="DisplayName" Height="38" Margin="0"/>
+                            <ComboBox ItemsSource="{Binding Roles}" SelectedItem="{Binding SelectedRole, Mode=TwoWay}" DisplayMemberPath="DisplayName" Style="{StaticResource InputCombo}"/>
 
                             <TextBlock Text="Mật khẩu / mật khẩu tạm" Style="{StaticResource FormLabel}" Margin="0,12,0,6"/>
                             <PasswordBox x:Name="PasswordInput" PasswordChanged="PasswordInput_PasswordChanged" Style="{StaticResource PasswordInput}"/>
@@ -116,22 +122,29 @@
                     </ScrollViewer>
                 </Border>
 
-                <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="12">
+                <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="10">
                     <DataGrid ItemsSource="{Binding Users}"
                               SelectedItem="{Binding SelectedUser, Mode=TwoWay}"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
                               IsReadOnly="True"
-                              HeadersVisibility="Column">
+                              HeadersVisibility="Column"
+                              RowHeaderWidth="0"
+                              ColumnHeaderHeight="38"
+                              RowHeight="34"
+                              GridLinesVisibility="Horizontal"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              CanUserResizeColumns="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding UserName}" Width="130"/>
-                            <DataGridTextColumn Header="Tên hiển thị" Binding="{Binding DisplayName}" Width="170"/>
-                            <DataGridTextColumn Header="Vai trò" Binding="{Binding RoleDisplayName}" Width="150"/>
-                            <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusText}" Width="120"/>
-                            <DataGridTextColumn Header="Ghi chú bảo mật" Binding="{Binding SecurityNote}" Width="180"/>
-                            <DataGridTextColumn Header="Số lần sai" Binding="{Binding FailedLoginCount}" Width="95"/>
-                            <DataGridTextColumn Header="Đăng nhập gần nhất" Binding="{Binding LastLoginAt}" Width="160"/>
-                            <DataGridTextColumn Header="Đổi mật khẩu gần nhất" Binding="{Binding PasswordChangedAt}" Width="170"/>
+                            <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding UserName}" Width="1.2*" MinWidth="145"/>
+                            <DataGridTextColumn Header="Tên hiển thị" Binding="{Binding DisplayName}" Width="1.5*" MinWidth="170"/>
+                            <DataGridTextColumn Header="Vai trò" Binding="{Binding RoleDisplayName}" Width="1.3*" MinWidth="150"/>
+                            <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusText}" Width="1*" MinWidth="120"/>
+                            <DataGridTextColumn Header="Ghi chú bảo mật" Binding="{Binding SecurityNote}" Width="1.5*" MinWidth="180"/>
+                            <DataGridTextColumn Header="Số lần sai" Binding="{Binding FailedLoginCount}" Width="0.8*" MinWidth="95"/>
+                            <DataGridTextColumn Header="Đăng nhập gần nhất" Binding="{Binding LastLoginAt}" Width="1.3*" MinWidth="165"/>
+                            <DataGridTextColumn Header="Đổi mật khẩu gần nhất" Binding="{Binding PasswordChangedAt}" Width="1.35*" MinWidth="175"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>

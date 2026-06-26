@@ -6,13 +6,13 @@
     <UserControl.Resources>
         <Style x:Key="AiCmd" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Height" Value="38"/>
-            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="MinWidth" Value="118"/>
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Padding" Value="12,7"/>
         </Style>
         <Style x:Key="AiPrimaryCmd" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentButton}">
             <Setter Property="Height" Value="38"/>
-            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="MinWidth" Value="118"/>
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Padding" Value="12,7"/>
         </Style>
@@ -73,14 +73,28 @@
 
                     <Grid Margin="0,12,0,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="110"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Câu hỏi AI" FontWeight="SemiBold" VerticalAlignment="Center" Margin="4,0,8,0"/>
-                        <TextBox Grid.Column="1" Text="{Binding Question, UpdateSourceTrigger=PropertyChanged}" Height="40" MinWidth="300" ToolTip="Ví dụ: Gợi ý xe dưới 40 triệu cho sinh viên"/>
-                        <WrapPanel Grid.Column="2" VerticalAlignment="Center" Margin="8,0,0,0">
-                            <Button Content="Hỏi AI" Command="{Binding AskCommand}" Style="{StaticResource AiPrimaryCmd}"/>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Câu hỏi AI" FontWeight="SemiBold" VerticalAlignment="Center" Margin="4,0,8,0"/>
+                        <Grid Grid.Column="1" Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding Question, UpdateSourceTrigger=PropertyChanged}"
+                                     Height="40"
+                                     MinWidth="260"
+                                     Margin="0,0,8,0"
+                                     ToolTip="Ví dụ: Gợi ý xe dưới 40 triệu cho sinh viên"/>
+                            <Button Grid.Column="1" Content="Hỏi AI" Command="{Binding AskCommand}" Style="{StaticResource AiPrimaryCmd}"/>
+                        </Grid>
+                        <WrapPanel Grid.Column="1" Grid.Row="1" Margin="0,8,0,0">
                             <Button Content="Tư vấn xe" Command="{Binding AdviseProductCommand}" Style="{StaticResource AiCmd}"/>
                             <Button Content="Tìm kiếm" Command="{Binding SmartSearchCommand}" Style="{StaticResource AiCmd}"/>
                             <Button Content="Làm mới" Command="{Binding ClearCommand}" Style="{StaticResource AiCmd}"/>

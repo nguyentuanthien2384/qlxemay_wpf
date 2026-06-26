@@ -20,81 +20,69 @@
             <Border.Effect>
                 <DropShadowEffect Color="#0F172A" Opacity="0.08" BlurRadius="20" ShadowDepth="0"/>
             </Border.Effect>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="12"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="12"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="12"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="12"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="12"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Border Width="46" Height="46" CornerRadius="12" Background="{StaticResource AccentSoft}">
-                        <TextBlock Text="🛒" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="Đăng ký mua hàng" FontSize="22" FontWeight="Bold"/>
-                        <TextBlock Text="Tạo tài khoản để đăng nhập và đặt mua xe trực tuyến."
-                                   Foreground="{StaticResource Muted}" TextWrapping="Wrap" FontSize="12" Margin="0,2,0,0"/>
+            <DockPanel LastChildFill="True">
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
+                    <TextBlock x:Name="MessageTextBlock"
+                               TextWrapping="Wrap"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource Danger}"
+                               Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Click="Cancel_Click" Height="40" MinWidth="110"/>
+                        <Button Content="Đăng ký" Click="Register_Click" Style="{StaticResource AccentButton}" Height="40" MinWidth="140" Margin="10,0,0,0"/>
                     </StackPanel>
                 </StackPanel>
 
-                <StackPanel Grid.Row="2">
-                    <TextBlock Text="Họ và tên" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="FullNameTextBox" Height="40" Margin="0"/>
-                </StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="46" Height="46" CornerRadius="12" Background="{StaticResource AccentSoft}">
+                                <TextBlock Text="🛒" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Đăng ký mua hàng" FontSize="22" FontWeight="Bold"/>
+                                <TextBlock Text="Tạo tài khoản để đăng nhập và đặt mua xe trực tuyến."
+                                           Foreground="{StaticResource Muted}" TextWrapping="Wrap" FontSize="12" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
 
-                <StackPanel Grid.Row="4">
-                    <TextBlock Text="Số điện thoại" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="PhoneTextBox" Height="40" Margin="0"/>
-                </StackPanel>
+                        <StackPanel Margin="0,20,0,0">
+                            <TextBlock Text="Họ và tên" Style="{StaticResource FieldLabel}"/>
+                            <TextBox x:Name="FullNameTextBox" Height="40" Margin="0"/>
+                        </StackPanel>
 
-                <StackPanel Grid.Row="6">
-                    <TextBlock Text="Địa chỉ" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="AddressTextBox" Height="40" Margin="0"/>
-                </StackPanel>
+                        <StackPanel Margin="0,12,0,0">
+                            <TextBlock Text="Số điện thoại" Style="{StaticResource FieldLabel}"/>
+                            <TextBox x:Name="PhoneTextBox" Height="40" Margin="0"/>
+                        </StackPanel>
 
-                <StackPanel Grid.Row="8">
-                    <TextBlock Text="Tên đăng nhập" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="UserNameTextBox" Height="40" Margin="0"/>
-                </StackPanel>
+                        <StackPanel Margin="0,12,0,0">
+                            <TextBlock Text="Địa chỉ" Style="{StaticResource FieldLabel}"/>
+                            <TextBox x:Name="AddressTextBox" Height="40" Margin="0"/>
+                        </StackPanel>
 
-                <StackPanel Grid.Row="10">
-                    <TextBlock Text="Mật khẩu" Style="{StaticResource FieldLabel}"/>
-                    <PasswordBox x:Name="PasswordBox" Height="40" Margin="0"/>
-                </StackPanel>
+                        <StackPanel Margin="0,12,0,0">
+                            <TextBlock Text="Tên đăng nhập" Style="{StaticResource FieldLabel}"/>
+                            <TextBox x:Name="UserNameTextBox" Height="40" Margin="0"/>
+                        </StackPanel>
 
-                <StackPanel Grid.Row="12">
-                    <TextBlock Text="Nhập lại mật khẩu" Style="{StaticResource FieldLabel}"/>
-                    <PasswordBox x:Name="ConfirmPasswordBox" Height="40" Margin="0"/>
-                </StackPanel>
+                        <StackPanel Margin="0,12,0,0">
+                            <TextBlock Text="Mật khẩu" Style="{StaticResource FieldLabel}"/>
+                            <PasswordBox x:Name="PasswordBox" Height="40" Margin="0"/>
+                        </StackPanel>
 
-                <Border Grid.Row="14" Background="{StaticResource AccentSoft}" BorderBrush="#BFDBFE" BorderThickness="1" CornerRadius="8" Padding="12">
-                    <TextBlock Text="Mật khẩu tối thiểu 10 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt. Tài khoản khách hàng được kích hoạt ngay sau khi đăng ký."
-                               TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12"/>
-                </Border>
+                        <StackPanel Margin="0,12,0,0">
+                            <TextBlock Text="Nhập lại mật khẩu" Style="{StaticResource FieldLabel}"/>
+                            <PasswordBox x:Name="ConfirmPasswordBox" Height="40" Margin="0"/>
+                        </StackPanel>
 
-                <TextBlock x:Name="MessageTextBlock" Grid.Row="15" VerticalAlignment="Top" Margin="0,14,0,0"
-                           TextWrapping="Wrap" FontWeight="SemiBold" Foreground="{StaticResource Danger}"/>
-
-                <StackPanel Grid.Row="16" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Hủy" Click="Cancel_Click" Height="40" MinWidth="110"/>
-                    <Button Content="Đăng ký" Click="Register_Click" Style="{StaticResource AccentButton}" Height="40" MinWidth="140" Margin="10,0,0,0"/>
-                </StackPanel>
-            </Grid>
+                        <Border Background="{StaticResource AccentSoft}" BorderBrush="#BFDBFE" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,14,0,0">
+                            <TextBlock Text="Mật khẩu tối thiểu 10 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt. Tài khoản khách hàng được kích hoạt ngay sau khi đăng ký."
+                                       TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12"/>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
         </Border>
     </Grid>
 </Window>
