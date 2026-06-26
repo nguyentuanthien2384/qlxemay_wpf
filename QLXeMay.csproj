@@ -18,4 +18,8 @@
     <Compile Remove="QLXeMay.Tests\**\*.cs" />
     <None Remove="QLXeMay.Tests\**\*" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\Products\**\*.png" />
+  </ItemGroup>
 </Project>
