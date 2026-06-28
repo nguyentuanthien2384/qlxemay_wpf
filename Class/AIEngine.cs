@@ -768,49 +768,207 @@ namespace QLXeMay.Class
             return sb.ToString();
         }
 
+        public static string TaoKichBanMauChiTiet()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("📚 KỊCH BẢN MẪU CHI TIẾT - TRỢ LÝ AI");
+            sb.AppendLine("════════════════════════════════════════════════════");
+            sb.AppendLine("\nI. Kịch bản điều hành (CEO / quản lý)");
+            sb.AppendLine("  1) Câu hỏi: Tổng quan tình hình kinh doanh hôm nay");
+            sb.AppendLine("     • Mục tiêu: nắm KPI vận hành nhanh.");
+            sb.AppendLine("     • Kết quả mong đợi: doanh thu, lợi nhuận ước tính, số đơn, tồn kho, cảnh báo hành động.");
+            sb.AppendLine("  2) Câu hỏi: Dự báo doanh thu 30 ngày tới và mức độ tin cậy");
+            sb.AppendLine("     • Mục tiêu: lập chỉ tiêu tháng tới.");
+            sb.AppendLine("     • Kết quả mong đợi: khoảng dự báo thấp-cao, độ tin cậy, số đơn cần đạt.");
+            sb.AppendLine("  3) Câu hỏi: So sánh doanh thu tháng này với tháng trước");
+            sb.AppendLine("     • Mục tiêu: theo dõi tăng trưởng.");
+            sb.AppendLine("     • Kết quả mong đợi: xu hướng tăng/giảm, giải thích nguyên nhân khả dĩ.");
+
+            sb.AppendLine("\nII. Kịch bản tồn kho - nhập hàng");
+            sb.AppendLine("  4) Câu hỏi: Xe nào nên nhập thêm trong tháng này?");
+            sb.AppendLine("     • Mục tiêu: tránh thiếu hàng.");
+            sb.AppendLine("     • Kết quả mong đợi: danh sách mã cần nhập, số lượng đề xuất, vốn dự kiến.");
+            sb.AppendLine("  5) Câu hỏi: Sản phẩm nào tồn kho cao cần khuyến mãi?");
+            sb.AppendLine("     • Mục tiêu: giảm vốn chôn tồn.");
+            sb.AppendLine("     • Kết quả mong đợi: nhóm hàng bán chậm, ưu tiên xả kho, gợi ý chương trình.");
+            sb.AppendLine("  6) Câu hỏi: Có xe nào sắp hết hàng không?");
+            sb.AppendLine("     • Mục tiêu: xử lý cảnh báo sớm.");
+            sb.AppendLine("     • Kết quả mong đợi: mã xe thiếu hàng, mức độ gấp và hành động trong 24-72h.");
+
+            sb.AppendLine("\nIII. Kịch bản bán hàng - tư vấn khách");
+            sb.AppendLine("  7) Câu hỏi: Gợi ý xe dưới 40 triệu cho sinh viên đi học");
+            sb.AppendLine("     • Mục tiêu: tư vấn theo ngân sách.");
+            sb.AppendLine("     • Kết quả mong đợi: 3-5 mẫu phù hợp + lý do.");
+            sb.AppendLine("  8) Câu hỏi: Tư vấn xe tay ga cho khách nữ đi trong thành phố");
+            sb.AppendLine("     • Mục tiêu: tư vấn theo nhu cầu sử dụng.");
+            sb.AppendLine("     • Kết quả mong đợi: mẫu xe phù hợp + ưu/nhược điểm thực tế.");
+            sb.AppendLine("  9) Câu hỏi: Top xe bán chạy và lý do nên tiếp tục nhập");
+            sb.AppendLine("     • Mục tiêu: ra quyết định danh mục.");
+            sb.AppendLine("     • Kết quả mong đợi: top doanh thu/số lượng + khuyến nghị nhập.");
+
+            sb.AppendLine("\nIV. Kịch bản khách hàng & nhân sự");
+            sb.AppendLine(" 10) Câu hỏi: Khách hàng VIP cần chăm sóc như thế nào?");
+            sb.AppendLine("     • Mục tiêu: tăng mua lại.");
+            sb.AppendLine("     • Kết quả mong đợi: tệp VIP, nhóm chưa mua, kế hoạch chăm sóc.");
+            sb.AppendLine(" 11) Câu hỏi: Nhân viên nào đang có hiệu suất bán tốt nhất?");
+            sb.AppendLine("     • Mục tiêu: quản trị hiệu suất.");
+            sb.AppendLine("     • Kết quả mong đợi: bảng xếp hạng theo doanh thu, đơn hàng, gợi ý KPI.");
+            sb.AppendLine(" 12) Câu hỏi: Tìm khách hàng ở Hà Nội");
+            sb.AppendLine("     • Mục tiêu: lọc dữ liệu nhanh để gọi chăm sóc.");
+            sb.AppendLine("     • Kết quả mong đợi: danh sách khách theo địa bàn + mức chi tiêu.");
+
+            sb.AppendLine("\nV. Mẹo đặt câu hỏi để AI trả lời chính xác hơn");
+            sb.AppendLine("  • Nêu rõ thời gian: hôm nay / 30 ngày / 3 tháng / tháng này.");
+            sb.AppendLine("  • Nêu rõ mục tiêu: nhập hàng, xả tồn, tăng doanh thu, chăm sóc khách.");
+            sb.AppendLine("  • Nêu rõ ràng buộc: ngân sách, hãng, màu, phân khúc.");
+            sb.AppendLine("  • Ví dụ tốt: 'Gợi ý xe Honda dưới 50 triệu còn hàng và bán tốt 90 ngày gần đây'.");
+
+            sb.AppendLine("\nVI. Gợi ý dữ liệu để AI phân tích sâu");
+            sb.AppendLine("  • Chạy Database/SampleData_Professional.sql nếu dữ liệu đang ít.");
+            sb.AppendLine("  • Cập nhật đều đơn bán/nhập để dự báo và cảnh báo rủi ro sát thực tế.");
+            sb.AppendLine("  • Chuẩn hóa tên xe, hãng, màu để kết quả tìm kiếm và tư vấn chính xác hơn.");
+
+            return sb.ToString();
+        }
+
+        public static string TaoKichBanMauTheoChuDe(string contextKey)
+        {
+            string key = Normalize(contextKey);
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("📚 KỊCH BẢN MẪU THEO PHẦN PHÂN TÍCH");
+            sb.AppendLine("════════════════════════════════════════════════════");
+            sb.AppendLine($"Chủ đề hiện tại: {ContextLabel(key)}");
+            sb.AppendLine("Phạm vi dữ liệu: dự án QLXeMay_WPF (SQL Server)");
+            sb.AppendLine("Bảng chính dùng phân tích: tbldmhang, tbldondathang, tblchitietddh, tblhoadonnhap, tblkhachhang, tblnhanvien.");
+
+            switch (key)
+            {
+                case "overview":
+                    sb.AppendLine("\n1) Tổng quan điều hành hôm nay");
+                    sb.AppendLine("   • Mục tiêu: xem nhanh KPI vận hành.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Tổng quan tình hình kinh doanh hôm nay");
+                    sb.AppendLine("     - KPI 30 ngày gần nhất đang tốt hay xấu?");
+                    sb.AppendLine("     - Cảnh báo điều hành ưu tiên trong tuần này?");
+                    sb.AppendLine("   • Kết quả mong đợi: doanh thu, tăng trưởng, tồn kho, khách hàng và hành động ưu tiên.");
+                    break;
+
+                case "forecast":
+                    sb.AppendLine("\n1) Dự báo doanh thu");
+                    sb.AppendLine("   • Mục tiêu: lập chỉ tiêu tháng.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Dự báo doanh thu 30 ngày tới và mức độ tin cậy");
+                    sb.AppendLine("     - Nếu giữ mức đơn hiện tại thì doanh thu tháng tới là bao nhiêu?");
+                    sb.AppendLine("     - Cần bao nhiêu đơn để đạt mục tiêu 2 tỷ?");
+                    sb.AppendLine("   • Kết quả mong đợi: dự báo trung tâm, khoảng thấp-cao, độ tin cậy, số đơn cần đạt.");
+                    break;
+
+                case "reorder":
+                    sb.AppendLine("\n1) Gợi ý nhập hàng");
+                    sb.AppendLine("   • Mục tiêu: tránh thiếu hàng, tối ưu vốn nhập.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Xe nào nên nhập thêm trong tháng này?");
+                    sb.AppendLine("     - Mã nào sắp hết cần nhập gấp?");
+                    sb.AppendLine("     - Ngân sách nhập đề xuất cho nhóm bán chạy?");
+                    sb.AppendLine("   • Kết quả mong đợi: mã ưu tiên, số lượng nhập, mức tồn an toàn, vốn dự kiến.");
+                    break;
+
+                case "inventory":
+                    sb.AppendLine("\n1) Phân tích tồn kho");
+                    sb.AppendLine("   • Mục tiêu: giảm tồn chậm, tránh thiếu hàng.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Sản phẩm nào tồn kho cao cần khuyến mãi?");
+                    sb.AppendLine("     - Có xe nào sắp hết hàng không?");
+                    sb.AppendLine("     - Tồn kho hiện có an toàn không?");
+                    sb.AppendLine("   • Kết quả mong đợi: nhóm tồn cao, nhóm sắp hết, vốn tồn và kế hoạch xử lý.");
+                    break;
+
+                case "revenue":
+                    sb.AppendLine("\n1) Phân tích doanh thu - lợi nhuận");
+                    sb.AppendLine("   • Mục tiêu: đánh giá hiệu quả kinh doanh.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Phân tích doanh thu và lợi nhuận hiện tại");
+                    sb.AppendLine("     - Top sản phẩm tạo doanh thu cao nhất?");
+                    sb.AppendLine("     - So sánh doanh thu tháng này với tháng trước");
+                    sb.AppendLine("   • Kết quả mong đợi: doanh thu, biên lợi nhuận, top xe, nhóm xe bán chậm.");
+                    break;
+
+                case "risk":
+                    sb.AppendLine("\n1) Cảnh báo rủi ro");
+                    sb.AppendLine("   • Mục tiêu: phát hiện sớm nguy cơ.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Phân tích rủi ro kinh doanh hiện tại");
+                    sb.AppendLine("     - Rủi ro nào đang ở mức cao nhất?");
+                    sb.AppendLine("     - Cần hành động gì trong 7 ngày tới?");
+                    sb.AppendLine("   • Kết quả mong đợi: rủi ro cao/trung bình, mức độ ảnh hưởng và kế hoạch kiểm soát.");
+                    break;
+
+                case "customers":
+                    sb.AppendLine("\n1) Phân tích khách hàng");
+                    sb.AppendLine("   • Mục tiêu: tăng chuyển đổi và mua lại.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Khách hàng VIP cần chăm sóc như thế nào?");
+                    sb.AppendLine("     - Có bao nhiêu khách chưa mua?");
+                    sb.AppendLine("     - Nhóm khách nào chi tiêu cao nhất?");
+                    sb.AppendLine("   • Kết quả mong đợi: phân nhóm khách, danh sách VIP/chưa mua, kịch bản chăm sóc.");
+                    break;
+
+                case "employees":
+                    sb.AppendLine("\n1) Phân tích nhân viên");
+                    sb.AppendLine("   • Mục tiêu: quản trị hiệu suất đội bán hàng.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Nhân viên nào đang có hiệu suất bán tốt nhất?");
+                    sb.AppendLine("     - KPI nhân viên tháng này ra sao?");
+                    sb.AppendLine("     - Ai cần hỗ trợ thêm để tăng doanh thu?");
+                    sb.AppendLine("   • Kết quả mong đợi: bảng xếp hạng, doanh thu theo nhân viên, gợi ý KPI.");
+                    break;
+
+                case "advice":
+                    sb.AppendLine("\n1) Tư vấn sản phẩm theo nhu cầu");
+                    sb.AppendLine("   • Mục tiêu: gợi ý mẫu xe phù hợp khách.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Gợi ý xe dưới 40 triệu cho sinh viên đi học");
+                    sb.AppendLine("     - Tư vấn xe tay ga cho khách nữ đi trong thành phố");
+                    sb.AppendLine("     - Xe nào bán chạy và còn hàng?");
+                    sb.AppendLine("   • Kết quả mong đợi: 3-5 xe phù hợp, lý do đề xuất, cách chốt sale.");
+                    break;
+
+                case "search":
+                    sb.AppendLine("\n1) Tìm kiếm thông minh");
+                    sb.AppendLine("   • Mục tiêu: tra cứu nhanh dữ liệu cụ thể.");
+                    sb.AppendLine("   • Câu hỏi mẫu:");
+                    sb.AppendLine("     - Tìm khách hàng ở Hà Nội");
+                    sb.AppendLine("     - Tìm xe Honda màu trắng còn hàng");
+                    sb.AppendLine("     - Tìm đơn bán của khách An");
+                    sb.AppendLine("   • Kết quả mong đợi: danh sách bản ghi phù hợp theo từ khóa.");
+                    break;
+
+                default:
+                    return TaoKichBanMauChiTiet();
+            }
+
+            sb.AppendLine("\nMẹo hỏi chính xác:");
+            sb.AppendLine("• Nêu rõ thời gian (hôm nay / 30 ngày / tháng này).");
+            sb.AppendLine("• Nêu rõ mục tiêu (nhập hàng / tăng doanh thu / chăm sóc khách).");
+            sb.AppendLine("• Nêu rõ ràng buộc (ngân sách, hãng, màu, phân khúc).");
+            return sb.ToString();
+        }
+
         // ===== TRẢ LỜI CÂU HỎI TỰ NHIÊN =====
         public static string TraLoiCauHoi(string cauHoi)
         {
             if (string.IsNullOrWhiteSpace(cauHoi)) return TaoKichBanMau();
 
             string q = Normalize(cauHoi);
-
-            if (ContainsAny(q, "vi du", "mau", "cau hoi mau", "demo", "huong dan", "goi y cau hoi"))
+            if (ContainsAny(q, "vi du", "mau", "cau hoi mau", "demo", "huong dan", "goi y cau hoi", "kich ban"))
                 return TaoKichBanMau();
 
-            if (ContainsAny(q, "tong quan", "hom nay", "dieu hanh", "dashboard", "tinh hinh"))
-                return TongQuanDieuHanh();
-
-            if (ContainsAny(q, "du bao", "forecast", "30 ngay toi", "thang toi", "du doan"))
-                return DuBaoDoanhThu();
-
-            if (ContainsAny(q, "nhap them", "nen nhap", "dat hang", "bo sung", "muc ton an toan"))
-                return GoiYNhapHang();
-
-            if (ContainsAny(q, "rui ro", "canh bao", "bat thuong", "nguy co", "kiem soat"))
-                return CanhBaoRuiRo();
-
-            if (ContainsAny(q, "ton kho", "kho", "hang ton", "sap het", "het hang", "ton cao", "ban cham"))
-                return PhanTichTonKho();
-
-            if (ContainsAny(q, "doanh thu", "loi nhuan", "ban duoc", "kinh doanh", "thu nhap", "bien loi nhuan", "so sanh doanh thu"))
-                return PhanTichDoanhThu();
-
-            if (ContainsAny(q, "khach", "vip", "nguoi mua", "cham soc", "chuyen doi"))
-                return PhanTichKhachHang();
-
-            if (ContainsAny(q, "nhan vien", "hieu suat", "kpi", "nv"))
-                return PhanTichNhanVien();
-
-            if (ContainsAny(q, "tu van", "goi y", "nen mua", "de xuat", "xe re", "cao cap", "sinh vien", "nu", "tay ga", "xe dien", "duoi", "trieu"))
-                return TuVanSanPham(cauHoi);
-
-            if (ContainsAny(q, "ban chay", "hot", "pho bien", "top"))
-                return TuVanSanPham("bán chạy");
-
-            string searchResult = TimKiemThongMinh(cauHoi);
-            if (searchResult.Contains("Không tìm thấy"))
+            List<IntentScore> intents = BuildIntentScores(q);
+            intents.Sort((a, b) => b.Score.CompareTo(a.Score));
+            if (intents.Count == 0 || intents[0].Score <= 0)
             {
+                string searchResult = TimKiemThongMinh(cauHoi);
+                if (!searchResult.Contains("Không tìm thấy")) return searchResult;
                 return "🤖 Tôi chưa hiểu rõ câu hỏi. Bạn có thể hỏi theo các mẫu sau:\n\n" +
                        "   • Tổng quan tình hình kinh doanh hôm nay\n" +
                        "   • Dự báo doanh thu 30 ngày tới\n" +
@@ -821,7 +979,27 @@ namespace QLXeMay.Class
                        "   • Nhân viên nào đang bán tốt nhất?\n";
             }
 
-            return searchResult;
+            IntentScore primary = intents[0];
+            IntentScore secondary = intents.Count > 1 ? intents[1] : null;
+            bool shouldCombine = secondary != null && secondary.Score >= primary.Score * 0.75 && secondary.Score >= 3;
+
+            StringBuilder output = new StringBuilder();
+            output.AppendLine("🧠 AI hiểu câu hỏi:");
+            output.AppendLine($"• Ý định chính: {primary.Label}");
+            if (shouldCombine) output.AppendLine($"• Ý định phụ: {secondary.Label}");
+            output.AppendLine("• Mức tự tin: " + ConfidenceLabel(primary.Score));
+            output.AppendLine("════════════════════════════════════════════════════");
+            output.AppendLine();
+            output.AppendLine(ResolveIntentResult(primary.Key, cauHoi));
+
+            if (shouldCombine && secondary.Key != primary.Key)
+            {
+                output.AppendLine("\n\n🧩 BỔ SUNG THEO Ý ĐỊNH PHỤ");
+                output.AppendLine("════════════════════════════════════════════════════");
+                output.AppendLine(ResolveIntentResult(secondary.Key, cauHoi));
+            }
+
+            return output.ToString();
         }
 
         private static void AppendTopProducts(StringBuilder sb, DataTable data, string title)
@@ -1066,6 +1244,79 @@ namespace QLXeMay.Class
             }
         }
 
+        private static string ContextLabel(string contextKey)
+        {
+            switch (contextKey)
+            {
+                case "overview": return "Tổng quan điều hành";
+                case "forecast": return "Dự báo doanh thu";
+                case "reorder": return "Gợi ý nhập hàng";
+                case "risk": return "Cảnh báo rủi ro";
+                case "inventory": return "Phân tích tồn kho";
+                case "revenue": return "Phân tích doanh thu";
+                case "customers": return "Phân tích khách hàng";
+                case "employees": return "Phân tích nhân viên";
+                case "advice": return "Tư vấn sản phẩm";
+                case "search": return "Tìm kiếm dữ liệu";
+                default: return "Tổng hợp";
+            }
+        }
+
+        private static List<IntentScore> BuildIntentScores(string normalizedQuestion)
+        {
+            List<IntentScore> intents = new List<IntentScore>
+            {
+                new IntentScore("overview", "Tổng quan điều hành", ScoreIntent(normalizedQuestion, "tong quan","hom nay","dieu hanh","dashboard","tinh hinh")),
+                new IntentScore("forecast", "Dự báo doanh thu", ScoreIntent(normalizedQuestion, "du bao","forecast","30 ngay","thang toi","du doan")),
+                new IntentScore("reorder", "Gợi ý nhập hàng", ScoreIntent(normalizedQuestion, "nhap them","nen nhap","bo sung","muc ton an toan","dat hang")),
+                new IntentScore("risk", "Cảnh báo rủi ro", ScoreIntent(normalizedQuestion, "rui ro","canh bao","nguy co","bat thuong","kiem soat")),
+                new IntentScore("inventory", "Phân tích tồn kho", ScoreIntent(normalizedQuestion, "ton kho","sap het","het hang","ton cao","ban cham","kho")),
+                new IntentScore("revenue", "Phân tích doanh thu", ScoreIntent(normalizedQuestion, "doanh thu","loi nhuan","kinh doanh","so sanh doanh thu","bien loi nhuan")),
+                new IntentScore("customers", "Phân tích khách hàng", ScoreIntent(normalizedQuestion, "khach","vip","nguoi mua","cham soc","chuyen doi")),
+                new IntentScore("employees", "Phân tích nhân viên", ScoreIntent(normalizedQuestion, "nhan vien","hieu suat","kpi","ban hang tot")),
+                new IntentScore("advice", "Tư vấn sản phẩm", ScoreIntent(normalizedQuestion, "tu van","goi y","nen mua","sinh vien","tay ga","xe dien","duoi","trieu","cao cap")),
+                new IntentScore("search", "Tìm kiếm dữ liệu", ScoreIntent(normalizedQuestion, "tim","tra cuu","ma khach","ma hang","ma don"))
+            };
+
+            intents.RemoveAll(i => i.Score <= 0);
+            return intents;
+        }
+
+        private static int ScoreIntent(string source, params string[] keywords)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return 0;
+            int score = 0;
+            foreach (string keyword in keywords)
+            {
+                if (source.Contains(keyword)) score++;
+            }
+            return score;
+        }
+
+        private static string ConfidenceLabel(int score)
+        {
+            if (score >= 4) return "Cao";
+            if (score >= 2) return "Trung bình";
+            return "Thấp";
+        }
+
+        private static string ResolveIntentResult(string intentKey, string rawQuestion)
+        {
+            switch (intentKey)
+            {
+                case "overview": return TongQuanDieuHanh();
+                case "forecast": return DuBaoDoanhThu();
+                case "reorder": return GoiYNhapHang();
+                case "risk": return CanhBaoRuiRo();
+                case "inventory": return PhanTichTonKho();
+                case "revenue": return PhanTichDoanhThu();
+                case "customers": return PhanTichKhachHang();
+                case "employees": return PhanTichNhanVien();
+                case "advice": return TuVanSanPham(rawQuestion);
+                default: return TimKiemThongMinh(rawQuestion);
+            }
+        }
+
         private static bool ContainsAny(string source, params string[] keywords)
         {
             if (string.IsNullOrWhiteSpace(source)) return false;
@@ -1157,6 +1408,20 @@ namespace QLXeMay.Class
             public DataRow Row { get; set; }
             public double Score { get; set; }
             public string Reason { get; set; }
+        }
+
+        private sealed class IntentScore
+        {
+            public IntentScore(string key, string label, int score)
+            {
+                Key = key;
+                Label = label;
+                Score = score;
+            }
+
+            public string Key { get; }
+            public string Label { get; }
+            public int Score { get; }
         }
 
         private sealed class ReorderRecommendation

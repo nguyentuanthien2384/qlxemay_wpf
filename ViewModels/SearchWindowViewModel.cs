@@ -91,7 +91,37 @@ namespace QLXeMay.ViewModels
                 return;
             }
 
-            excelExportService.Export(currentResult, WindowTitle, "TimKiem");
+            excelExportService.Export(
+                currentResult,
+                WindowTitle,
+                "TimKiem",
+                BuildExportHeaderFields(),
+                BuildExportFooterFields());
+        }
+
+        private IReadOnlyList<ExcelExportField> BuildExportHeaderFields()
+        {
+            List<ExcelExportField> fields = new List<ExcelExportField>
+            {
+                new ExcelExportField("Chức năng", WindowTitle)
+            };
+
+            IReadOnlyDictionary<string, string> criteria = readCriteria();
+            foreach (KeyValuePair<string, string> item in criteria)
+            {
+                if (string.IsNullOrWhiteSpace(item.Value)) continue;
+                fields.Add(new ExcelExportField(item.Key, item.Value));
+            }
+
+            return fields;
+        }
+
+        private IReadOnlyList<ExcelExportField> BuildExportFooterFields()
+        {
+            return new List<ExcelExportField>
+            {
+                new ExcelExportField("Số dòng kết quả", currentResult?.Rows.Count.ToString() ?? "0")
+            };
         }
     }
 }

@@ -1,14 +1,48 @@
 <UserControl x:Class="QLXeMay.Windows.AIAssistantWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:infra="clr-namespace:QLXeMay.Infrastructure"
              Background="{StaticResource Surface}"
              FontFamily="Segoe UI">
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <infra:NavActiveConverter x:Key="ActiveKeyMatchConverter"/>
         <Style x:Key="AiCmd" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Height" Value="38"/>
             <Setter Property="MinWidth" Value="118"/>
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Padding" Value="12,7"/>
+        </Style>
+        <Style x:Key="AiQuickCmd" TargetType="{x:Type Button}" BasedOn="{StaticResource AiCmd}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chrome" CornerRadius="6"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="{StaticResource Card}"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderStrong}"/>
+            <Style.Triggers>
+                <DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource ActiveKeyMatchConverter}">
+                            <Binding Path="Tag" RelativeSource="{RelativeSource Self}"/>
+                            <Binding Path="CurrentContextKey"/>
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="Background" Value="{StaticResource Accent}"/>
+                    <Setter Property="Foreground" Value="{StaticResource OnAccent}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource Accent}"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
         <Style x:Key="AiPrimaryCmd" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentButton}">
             <Setter Property="Height" Value="38"/>
@@ -35,19 +69,10 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Style="{StaticResource CardBorder}" Padding="18" Margin="0,0,0,12">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <TextBlock Text="TRỢ LÝ AI PHÂN TÍCH KINH DOANH" FontSize="24" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
-                    <TextBlock Text="Dự báo doanh thu, cảnh báo tồn kho, tư vấn nhập hàng và gợi ý chăm sóc khách hàng dựa trên dữ liệu SQL Server của cửa hàng." Foreground="{StaticResource Muted}" Margin="0,6,0,0" TextWrapping="Wrap"/>
-                </StackPanel>
-                <Border Grid.Column="1" Background="{StaticResource SuccessSoft}" BorderBrush="{StaticResource Success}" BorderThickness="1" CornerRadius="18" Padding="12,7" VerticalAlignment="Center" Margin="16,0,0,0">
-                    <TextBlock Text="● Offline AI - Không cần API key" Foreground="{StaticResource Success}" FontWeight="SemiBold"/>
-                </Border>
-            </Grid>
+            <StackPanel>
+                <TextBlock Text="TRỢ LÝ AI PHÂN TÍCH KINH DOANH" FontSize="24" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
+                <TextBlock Text="Dự báo doanh thu, cảnh báo tồn kho, tư vấn nhập hàng và gợi ý chăm sóc khách hàng dựa trên dữ liệu SQL Server của cửa hàng." Foreground="{StaticResource Muted}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+            </StackPanel>
         </Border>
 
         <Grid Grid.Row="1" Margin="0,0,0,12">
@@ -61,14 +86,14 @@
                 <StackPanel>
                     <TextBlock Text="Phân tích nhanh" FontSize="16" FontWeight="Bold" Margin="4,0,0,8"/>
                     <WrapPanel>
-                        <Button Content="Tổng quan điều hành" Command="{Binding ExecutiveSummaryCommand}" Style="{StaticResource AiPrimaryCmd}"/>
-                        <Button Content="Dự báo 30 ngày" Command="{Binding ForecastRevenueCommand}" Style="{StaticResource AiCmd}"/>
-                        <Button Content="Gợi ý nhập hàng" Command="{Binding ReorderAdviceCommand}" Style="{StaticResource AiCmd}"/>
-                        <Button Content="Cảnh báo rủi ro" Command="{Binding RiskWarningCommand}" Style="{StaticResource AiCmd}"/>
-                        <Button Content="Tồn kho" Command="{Binding AnalyzeInventoryCommand}" Style="{StaticResource AiCmd}"/>
-                        <Button Content="Doanh thu" Command="{Binding AnalyzeRevenueCommand}" Style="{StaticResource AiCmd}"/>
-                        <Button Content="Khách hàng" Command="{Binding AnalyzeCustomersCommand}" Style="{StaticResource AiCmd}"/>
-                        <Button Content="Nhân viên" Command="{Binding AnalyzeEmployeesCommand}" Style="{StaticResource AiCmd}"/>
+                        <Button Content="Tổng quan điều hành" Tag="overview" Command="{Binding ExecutiveSummaryCommand}" Style="{StaticResource AiQuickCmd}"/>
+                        <Button Content="Dự báo 30 ngày" Tag="forecast" Command="{Binding ForecastRevenueCommand}" Style="{StaticResource AiQuickCmd}"/>
+                        <Button Content="Gợi ý nhập hàng" Tag="reorder" Command="{Binding ReorderAdviceCommand}" Style="{StaticResource AiQuickCmd}"/>
+                        <Button Content="Cảnh báo rủi ro" Tag="risk" Command="{Binding RiskWarningCommand}" Style="{StaticResource AiQuickCmd}"/>
+                        <Button Content="Tồn kho" Tag="inventory" Command="{Binding AnalyzeInventoryCommand}" Style="{StaticResource AiQuickCmd}"/>
+                        <Button Content="Doanh thu" Tag="revenue" Command="{Binding AnalyzeRevenueCommand}" Style="{StaticResource AiQuickCmd}"/>
+                        <Button Content="Khách hàng" Tag="customers" Command="{Binding AnalyzeCustomersCommand}" Style="{StaticResource AiQuickCmd}"/>
+                        <Button Content="Nhân viên" Tag="employees" Command="{Binding AnalyzeEmployeesCommand}" Style="{StaticResource AiQuickCmd}"/>
                     </WrapPanel>
 
                     <Grid Margin="0,12,0,0">
@@ -136,6 +161,7 @@
                     <StackPanel>
                         <TextBlock Text="Kết quả phân tích" FontSize="16" FontWeight="Bold"/>
                         <TextBlock Text="Kết quả được trình bày theo dạng báo cáo: KPI, nhận định, rủi ro và hành động đề xuất." Foreground="{StaticResource Muted}" Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding CurrentContextLabel, StringFormat=Ngữ cảnh hiện tại: {0}}" Foreground="{StaticResource AccentPressed}" FontWeight="SemiBold" Margin="0,4,0,0"/>
                     </StackPanel>
                 </DockPanel>
                 <TextBox Grid.Row="1"
@@ -155,5 +181,52 @@
                          IsReadOnly="True"/>
             </Grid>
         </Border>
+
+        <Border Grid.RowSpan="3"
+                Background="#66000000"
+                Visibility="{Binding IsSampleScenarioPanelOpen, Converter={StaticResource BoolToVis}}"
+                Panel.ZIndex="50">
+            <Grid Margin="28">
+                <Border MaxWidth="980"
+                        MaxHeight="700"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{StaticResource Card}"
+                        BorderBrush="{StaticResource BorderStrong}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                            <Button DockPanel.Dock="Right" Content="Đóng" Command="{Binding CloseSampleScenariosCommand}" Style="{StaticResource AiCmd}"/>
+                            <StackPanel>
+                                <TextBlock Text="Kết quả phân tích - Xem chi tiết" FontSize="18" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
+                                <TextBlock Text="Nội dung được đồng bộ với khung Kết quả phân tích bên dưới." Foreground="{StaticResource Muted}" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </DockPanel>
+                        <TextBox Grid.Row="1"
+                                 Text="{Binding SampleScenarioDetails, Mode=OneWay}"
+                                 Style="{x:Null}"
+                                 FontFamily="Consolas"
+                                 FontSize="13.5"
+                                 Foreground="{StaticResource Ink}"
+                                 Background="{StaticResource CardAlt}"
+                                 BorderBrush="{StaticResource Border}"
+                                 BorderThickness="1"
+                                 Padding="14"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 IsReadOnly="True"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
     </Grid>
 </UserControl>

@@ -14,6 +14,7 @@
             <Setter Property="Margin" Value="0,0,0,4"/>
             <Setter Property="Padding" Value="14,0"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="ClickMode" Value="Press"/>
             <Setter Property="FontSize" Value="13.5"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="#475569"/>
@@ -29,23 +30,6 @@
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <DataTrigger Value="True">
-                                <DataTrigger.Binding>
-                                    <MultiBinding Converter="{StaticResource NavActiveConverter}">
-                                        <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Tag"/>
-                                        <Binding Path="ActiveNavKey"/>
-                                    </MultiBinding>
-                                </DataTrigger.Binding>
-                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource Accent}"/>
-                                <Setter TargetName="Bar" Property="Opacity" Value="1"/>
-                                <Setter TargetName="Bar" Property="Background" Value="#FFFFFF"/>
-                                <Setter Property="Foreground" Value="{StaticResource OnAccent}"/>
-                            </DataTrigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="#EEF2FB"/>
-                                <Setter TargetName="Bar" Property="Opacity" Value="1"/>
-                                <Setter Property="Foreground" Value="#1D4ED8"/>
-                            </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="#CBD5E1"/>
                             </Trigger>
@@ -53,6 +37,18 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource NavActiveConverter}">
+                            <Binding RelativeSource="{RelativeSource Self}" Path="Tag"/>
+                            <Binding RelativeSource="{RelativeSource Self}" Path="DataContext.ActiveNavKey"/>
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="Background" Value="{StaticResource Accent}"/>
+                    <Setter Property="Foreground" Value="{StaticResource OnAccent}"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 

@@ -17,5 +17,6 @@ namespace QLXeMay.Services
         string SmartSearch(string keyword);
         string AnswerQuestion(string question);
         string SampleScenarios();
+        string SampleScenariosDetailed(string contextKey);
     }
 }

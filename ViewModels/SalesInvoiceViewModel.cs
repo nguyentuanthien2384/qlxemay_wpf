@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Windows.Input;
 using QLXeMay.Class;
@@ -249,7 +250,40 @@ namespace QLXeMay.ViewModels
                 return;
             }
 
-            excelExportService.Export(DetailsView.ToTable(), "HÓA ĐƠN BÁN HÀNG - " + InvoiceNo, "HoaDonBan");
+            DataTable details = DetailsView.ToTable();
+            excelExportService.Export(
+                details,
+                "HÓA ĐƠN BÁN HÀNG - " + InvoiceNo,
+                "HoaDonBan",
+                BuildExportHeaderFields(),
+                BuildExportFooterFields(details));
+        }
+
+        private IReadOnlyList<ExcelExportField> BuildExportHeaderFields()
+        {
+            return new List<ExcelExportField>
+            {
+                new ExcelExportField("Mã đơn bán", InvoiceNo),
+                new ExcelExportField("Ngày bán", (InvoiceDate ?? DateTime.Today).ToString("dd/MM/yyyy")),
+                new ExcelExportField("Mã nhân viên", SelectedEmployeeId),
+                new ExcelExportField("Tên nhân viên", EmployeeName),
+                new ExcelExportField("Mã khách hàng", SelectedCustomerId),
+                new ExcelExportField("Tên khách hàng", CustomerName),
+                new ExcelExportField("Địa chỉ", CustomerAddress),
+                new ExcelExportField("Số điện thoại", CustomerPhone)
+            };
+        }
+
+        private IReadOnlyList<ExcelExportField> BuildExportFooterFields(DataTable details)
+        {
+            return new List<ExcelExportField>
+            {
+                new ExcelExportField("Số dòng sản phẩm", details.Rows.Count.ToString()),
+                new ExcelExportField("Tổng tiền", Total),
+                new ExcelExportField("Thuế", Tax),
+                new ExcelExportField("Đặt cọc", Deposit),
+                new ExcelExportField("Bằng chữ", AmountInWords)
+            };
         }
 
         private bool Validate(out int parsedQuantity, out double parsedDiscount)

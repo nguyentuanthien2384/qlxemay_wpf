@@ -18,5 +18,6 @@ namespace QLXeMay.Services
         public string SmartSearch(string keyword) => AIEngine.TimKiemThongMinh(keyword);
         public string AnswerQuestion(string question) => AIEngine.TraLoiCauHoi(question);
         public string SampleScenarios() => AIEngine.TaoKichBanMau();
+        public string SampleScenariosDetailed(string contextKey) => AIEngine.TaoKichBanMauTheoChuDe(contextKey);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Windows;
@@ -140,7 +141,47 @@ namespace QLXeMay.ViewModels
                 return;
             }
 
-            excelExportService.Export(currentMainTable, WindowTitle, "BaoCao");
+            excelExportService.Export(
+                currentMainTable,
+                WindowTitle,
+                "BaoCao",
+                BuildExportHeaderFields(),
+                BuildExportFooterFields());
+        }
+
+        private IReadOnlyList<ExcelExportField> BuildExportHeaderFields()
+        {
+            List<ExcelExportField> result = new List<ExcelExportField>
+            {
+                new ExcelExportField("Loại báo cáo", WindowTitle)
+            };
+
+            if (mode == ReportMode.TopSanPham)
+            {
+                result.Add(new ExcelExportField("Nhóm thống kê", SelectedGroup?.Name ?? "Sản phẩm"));
+            }
+            else
+            {
+                result.Add(new ExcelExportField("Từ ngày", (DateFrom ?? DateTime.Today.AddMonths(-1)).ToString("dd/MM/yyyy")));
+                result.Add(new ExcelExportField("Đến ngày", (DateTo ?? DateTime.Today).ToString("dd/MM/yyyy")));
+            }
+
+            return result;
+        }
+
+        private IReadOnlyList<ExcelExportField> BuildExportFooterFields()
+        {
+            List<ExcelExportField> result = new List<ExcelExportField>
+            {
+                new ExcelExportField("Tổng số dòng", currentMainTable?.Rows.Count.ToString() ?? "0")
+            };
+
+            if (!string.IsNullOrWhiteSpace(SummaryText))
+            {
+                result.Add(new ExcelExportField("Tóm tắt", SummaryText));
+            }
+
+            return result;
         }
     }
 }
